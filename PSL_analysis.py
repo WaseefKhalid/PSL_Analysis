@@ -619,8 +619,16 @@ def batsman_profile_analysis():
             if selected_bowling_styles:
                 player_df = player_df[player_df['bowl_style'].isin(selected_bowling_styles)]
 
+        # Check if player_df is not empty before processing further
         def player_profile(player_df, batsman_name):
-            # Check if player_df is not empty before processing further
+            # Log the columns of player_df to ensure required columns are present
+            st.write("Available columns in player_df:", player_df.columns)
+
+            # Ensure the 'isSix' column exists before proceeding
+            if 'isSix' not in player_df.columns:
+                st.error("Column 'isSix' not found in the dataset.")
+                return
+
             if player_df.empty:
                 st.write(f"No data available for {batsman_name.title()} or the player has not faced 300 balls.")
                 return
