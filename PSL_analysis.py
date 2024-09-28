@@ -595,7 +595,7 @@ def batsman_profile_analysis():
     if selected_batsman:
         batsman_name = selected_batsman.lower()
 
-        # Filter copy to avoid modifying original data
+        # Copy the filtered_df to player_df to avoid modifying the original data
         player_df = filtered_df.copy()
 
         # Ground filter activation
@@ -619,12 +619,20 @@ def batsman_profile_analysis():
             if selected_bowling_styles:
                 player_df = player_df[player_df['bowl_style'].isin(selected_bowling_styles)]
 
+        # Check if player_df is not empty before processing further
         def player_profile(batsman_name):
+            if player_df.empty:
+                st.write(f"No data available for {batsman_name.title()} or the player has not faced 300 balls.")
+                return
+
+            # Convert bat column to lowercase
             player_df['bat'] = player_df['bat'].str.lower()
+
+            # Filter for the selected batsman
             player_df = player_df[player_df['bat'] == batsman_name]
 
             if player_df.empty:
-                st.write(f"No data available for {batsman_name.title()} or the player has not faced 300 balls.")
+                st.write(f"No data available for {batsman_name.title()}.")
                 return
 
             # Calculate metrics
@@ -675,6 +683,7 @@ def batsman_profile_analysis():
                 st.table(control_phase_wise)
 
         player_profile(batsman_name)
+
 
 
 def bowler_profile_analysis():
