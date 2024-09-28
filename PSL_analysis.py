@@ -5,6 +5,7 @@ import os
 import requests
 from io import BytesIO
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Function to download and unzip IPL data
 def download_and_unzip_data(url):
@@ -97,7 +98,6 @@ def home_section():
     st.write("**Developed by [Waseef Khalid Khan](https://www.linkedin.com/in/waseef-khalid-khan-366951237)**")
 
 
-import matplotlib.pyplot as plt
 
 def effective_shots_on_different_grounds():
     st.markdown(
