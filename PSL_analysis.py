@@ -175,15 +175,14 @@ def effective_shots_on_different_grounds():
         st.subheader('Average Runs per Shot Type')
         fig, ax = plt.subplots()
         ax.barh(shot_analysis['shot'], shot_analysis['avg_runs'], color='skyblue')
-        for bar in bars:
-    # Get the width (which is the value of avg_runs)
-    width = bar.get_width()
-    # Place text slightly to the right of the end of the bar
-    ax.text(width, bar.get_y() + bar.get_height() / 2, 
-            f'{width:.2f}',  # Format the value to 2 decimal places
-            va='center',      # Vertically align the text to the center of the bar
-            ha='left',        # Horizontally align the text slightly to the right
-            color='black')    # You can set the text color
+       for bar in bars:
+           width = bar.get_width()
+           ax.text(width, bar.get_y() + bar.get_height() / 2, 
+                   f'{width:.2f}',  # Format the value to 2 decimal places
+                   va='center', 
+                   ha='left', 
+                   color='black')
+
         ax.set_xlabel('Average Runs')
         ax.set_ylabel('Shot Type')
         ax.set_title('Average Runs per Shot Type')
