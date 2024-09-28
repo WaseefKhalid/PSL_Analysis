@@ -97,6 +97,8 @@ def home_section():
     st.write("**Developed by [Waseef Khalid Khan](https://www.linkedin.com/in/waseef-khalid-khan-366951237)**")
 
 
+import matplotlib.pyplot as plt
+
 def effective_shots_on_different_grounds():
     st.markdown(
         """
@@ -168,11 +170,24 @@ def effective_shots_on_different_grounds():
 
         shot_analysis = shot_analysis.sort_values(by='avg_runs', ascending=False)
 
+        # Plot Average Runs per Shot Type as Horizontal Bar Chart
         st.subheader('Average Runs per Shot Type')
-        st.bar_chart(shot_analysis.set_index('shot')['avg_runs'], use_container_width=True)
+        fig, ax = plt.subplots()
+        ax.barh(shot_analysis['shot'], shot_analysis['avg_runs'], color='skyblue')
+        ax.set_xlabel('Average Runs')
+        ax.set_ylabel('Shot Type')
+        ax.set_title('Average Runs per Shot Type')
+        st.pyplot(fig)
 
+        # Plot Dismissal Rate per Shot Type as Horizontal Bar Chart
         st.subheader('Dismissal Rate per Shot Type (Percentage)')
-        st.bar_chart(shot_analysis.set_index('shot')['dismissal_rate'], use_container_width=True)
+        fig, ax = plt.subplots()
+        ax.barh(shot_analysis['shot'], shot_analysis['dismissal_rate'], color='salmon')
+        ax.set_xlabel('Dismissal Rate (%)')
+        ax.set_ylabel('Shot Type')
+        ax.set_title('Dismissal Rate per Shot Type')
+        st.pyplot(fig)
+
 
 def line_and_length():
     st.markdown(
