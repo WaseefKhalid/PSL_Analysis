@@ -6,9 +6,7 @@ import requests
 from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
-git add requirements.txt
-git commit -m "Add matplotlib to requirements"
-git push origin main  # or whatever branch you're using
+
 
 # Function to download and unzip IPL data
 def download_and_unzip_data(url):
