@@ -547,10 +547,7 @@ def batsman_profile_analysis():
     # Title with blue background and yellow text
     st.markdown('<div class="blue-bg-yellow-text"><h1>Batsman Profile Analysis</h1></div>', unsafe_allow_html=True)
 
-    # Ensure 'ball_id' column exists and calculate 'Phase'
-    if 'ball_id' not in df.columns:
-        st.error("Column 'ball_id' not found in the dataset.")
-        return
+    filtered_df = df.groupby('bat').filter(lambda x: x['ball'].count() >= 300)
 
     def determine_phase(ball_id):
         if ball_id <= 6:
@@ -560,93 +557,54 @@ def batsman_profile_analysis():
         else:
             return 'Death'
 
-    df['Phase'] = df['ball_id'].apply(determine_phase)
+    filtered_df['Phase'] = filtered_df['ball_id'].apply(determine_phase)
 
     # Ensure 'Phase' is ordered correctly
     phase_order = ['Powerplay', 'Middle', 'Death']
-    df['Phase'] = pd.Categorical(df['Phase'], categories=phase_order, ordered=True)
+    filtered_df['Phase'] = pd.Categorical(filtered_df['Phase'], categories=phase_order, ordered=True)
 
-    # Filter batsmen who have faced more than 300 balls
-    filtered_df = df.groupby('bat').filter(lambda x: x['ball'].count() >= 300)
-
-    # Add missing columns if they don't exist
-    if 'isSix' not in df.columns:
-        df['isSix'] = df['score'].apply(lambda x: 1 if x == 6 else 0)
-    if 'isFour' not in df.columns:
-        df['isFour'] = df['score'].apply(lambda x: 1 if x == 4 else 0)
-    if 'isDot' not in df.columns:
-        df['isDot'] = df['score'].apply(lambda x: 1 if x == 0 else 0)
-    if 'ActivityRuns' not in df.columns:
-        df['ActivityRuns'] = df['batruns']  # Replace with actual activity logic if needed
-    if 'control' not in df.columns:
-        df['control'] = 100  # Replace with actual control data if available
-
-    # Batsman search
     search_term = st.text_input("Start typing the name of the batsman:")
     filtered_batsmen = filtered_df['bat'].str.lower().unique()
     filtered_suggestions = [bat for bat in filtered_batsmen if search_term.lower() in bat]
-    
-    if not filtered_suggestions:
-        st.write("No batsman found matching your search.")
-        return
-    
     selected_batsman = st.selectbox("Select Batsman", options=filtered_suggestions, format_func=lambda x: x.title())
 
     if selected_batsman:
+        # Apply selected batsman
         batsman_name = selected_batsman.lower()
-
-        # Copy the filtered_df to player_df to avoid modifying the original data
-        player_df = filtered_df.copy()
 
         # Ground filter activation
         activate_ground_filter = st.checkbox("Activate Ground Filter")
         if activate_ground_filter:
-            selected_grounds = st.multiselect("Select Ground(s)", options=player_df['ground'].unique())
+            selected_grounds = st.multiselect("Select Ground(s)", options=filtered_df['ground'].unique())
             if selected_grounds:
-                player_df = player_df[player_df['ground'].isin(selected_grounds)]
+                filtered_df = filtered_df[filtered_df['ground'].isin(selected_grounds)]
 
         # Bowling kind filter activation
         activate_bowling_kind_filter = st.checkbox("Activate Bowling Kind Filter")
         if activate_bowling_kind_filter:
-            selected_bowling_kinds = st.multiselect("Select Bowling Kind(s)", options=player_df['bowl_kind'].unique())
+            selected_bowling_kinds = st.multiselect("Select Bowling Kind(s)", options=filtered_df['bowl_kind'].unique())
             if selected_bowling_kinds:
-                player_df = player_df[player_df['bowl_kind'].isin(selected_bowling_kinds)]
+                filtered_df = filtered_df[filtered_df['bowl_kind'].isin(selected_bowling_kinds)]
 
         # Bowling style filter activation
         activate_bowling_style_filter = st.checkbox("Activate Bowling Style Filter")
         if activate_bowling_style_filter:
-            selected_bowling_styles = st.multiselect("Select Bowling Style(s)", options=player_df['bowl_style'].unique())
+            selected_bowling_styles = st.multiselect("Select Bowling Style(s)", options=filtered_df['bowl_style'].unique())
             if selected_bowling_styles:
-                player_df = player_df[player_df['bowl_style'].isin(selected_bowling_styles)]
+                filtered_df = filtered_df[filtered_df['bowl_style'].isin(selected_bowling_styles)]
 
-        # Check if player_df is not empty before processing further
-        def player_profile(player_df, batsman_name):
-            # Log the columns of player_df to ensure required columns are present
-            st.write("Available columns in player_df:", player_df.columns)
-
-            # Ensure the 'isSix' column exists before proceeding
-            if 'isSix' not in player_df.columns:
-                st.error("Column 'isSix' not found in the dataset.")
-                return
+        def player_profile(batsman_name):
+            filtered_df['bat'] = filtered_df['bat'].str.lower()
+            player_df = filtered_df[filtered_df['bat'] == batsman_name]
 
             if player_df.empty:
                 st.write(f"No data available for {batsman_name.title()} or the player has not faced 300 balls.")
                 return
 
-            # Convert bat column to lowercase
-            player_df['bat'] = player_df['bat'].str.lower()
-
-            # Filter for the selected batsman
-            player_df = player_df[player_df['bat'] == batsman_name]
-
-            if player_df.empty:
-                st.write(f"No data available for {batsman_name.title()}.")
-                return
-
             # Calculate metrics
             sr_phase_wise = player_df.groupby('Phase').apply(lambda x: (x['batruns'].sum() / x['ball'].count()) * 100).reset_index()
-            sr_phase_wise.columns = ['Phase', 'Strike Rate']
-            sr_phase_wise['Strike Rate'] = sr_phase_wise['Strike Rate'].round(2)
+            sr_phase_wise.columns = ['Phase', 'SR']
+            sr_phase_wise['SR'] = sr_phase_wise['SR'].round(2)
 
             six_ratio_phase_wise = player_df.groupby('Phase').apply(lambda x: x['isSix'].sum() / x['ball'].count()).reset_index()
             six_ratio_phase_wise.columns = ['Phase', 'Six Ratio']
@@ -674,7 +632,7 @@ def batsman_profile_analysis():
                 st.write("### Strike Rate:")
                 st.table(sr_phase_wise)
 
-                st.write("### Balls per Six:")
+                st.write("### Balls per Six :")
                 st.table(six_ratio_phase_wise[['Phase', 'Balls per Six']])
 
                 st.write("### Balls per Four:")
@@ -690,8 +648,7 @@ def batsman_profile_analysis():
                 st.write("### Control Percentage:")
                 st.table(control_phase_wise)
 
-        # Call the player_profile function and pass the player_df
-        player_profile(player_df, batsman_name)
+        player_profile(batsman_name)
 
 def bowler_profile_analysis():
     # CSS for blue background and yellow text
