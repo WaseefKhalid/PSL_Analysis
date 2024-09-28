@@ -409,42 +409,29 @@ def batsman_swot():
         top_n = st.slider('Select Top N Based on Lowest Strike Rate', min_value=1, max_value=len(batsman_analysis), value=5)
         sorted_batsman_analysis = batsman_analysis.nsmallest(top_n, 'strike_rate')
 
-        # Display only selected columns
+        # Display selected columns along with line and length
         st.write('Batsman Analysis (Top N Based on Lowest SR):')
-        st.dataframe(sorted_batsman_analysis[['balls_per_dismissal', 'strike_rate', 'batting_avg']])
+        st.dataframe(sorted_batsman_analysis[['line', 'length', 'balls_per_dismissal', 'strike_rate', 'batting_avg']])
 
-        st.subheader(f'{selected_batsman.title()} vs Selected Bowling Kind(s)')
-        summary_df = batsman_filtered_df.groupby('bowl_kind').agg({
+        st.subheader(f'{selected_batsman.title()} vs Selected Bowling Style(s)')
+        style_summary_df = batsman_filtered_df.groupby('bowl_style').agg({
             'batruns': 'sum',
             'ball': 'count',
             'out': 'sum'
         }).reset_index()
 
-        summary_df['batting_avg'] = summary_df['batruns'] / summary_df['out']
-        summary_df['strike_rate'] = (summary_df['batruns'] / summary_df['ball']) * 100
+        style_summary_df['batting_avg'] = style_summary_df['batruns'] / style_summary_df['out']
+        style_summary_df['strike_rate'] = (style_summary_df['batruns'] / style_summary_df['ball']) * 100
 
-        summary_df['batting_avg'] = summary_df['batting_avg'].round(2)
-        summary_df['strike_rate'] = summary_df['strike_rate'].round(2)
+        style_summary_df['batting_avg'] = style_summary_df['batting_avg'].round(2)
+        style_summary_df['strike_rate'] = style_summary_df['strike_rate'].round(2)
 
-        st.write('Summary of Performance Against Selected Bowling Kinds:')
-        st.dataframe(summary_df[['bowl_kind', 'batting_avg', 'strike_rate', 'out']])
+        # Select top N based on low strike rate for style summary
+        style_summary_df = style_summary_df.nsmallest(top_n, 'strike_rate')
 
-        if activate_bowling_style_filter:
-            st.subheader(f'{selected_batsman.title()} vs Selected Bowling Style(s)')
-            style_summary_df = batsman_filtered_df.groupby('bowl_style').agg({
-                'batruns': 'sum',
-                'ball': 'count',
-                'out': 'sum'
-            }).reset_index()
+        st.write('Summary of Performance Against Selected Bowling Styles:')
+        st.dataframe(style_summary_df[['bowl_style', 'batting_avg', 'strike_rate', 'out']])
 
-            style_summary_df['batting_avg'] = style_summary_df['batruns'] / style_summary_df['out']
-            style_summary_df['strike_rate'] = (style_summary_df['batruns'] / style_summary_df['ball']) * 100
-
-            style_summary_df['batting_avg'] = style_summary_df['batting_avg'].round(2)
-            style_summary_df['strike_rate'] = style_summary_df['strike_rate'].round(2)
-
-            st.write('Summary of Performance Against Selected Bowling Styles:')
-            st.dataframe(style_summary_df[['bowl_style', 'batting_avg', 'strike_rate', 'out']])
 
 
 def toss_and_match_outcome_analysis():
