@@ -650,6 +650,8 @@ def batsman_profile_analysis():
 
         player_profile(batsman_name)
 
+
+
 def bowler_profile_analysis():
     # CSS for blue background and yellow text
     st.markdown(
