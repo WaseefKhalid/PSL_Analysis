@@ -15,7 +15,7 @@ def download_and_unzip_data(url):
     return os.path.join('ipl_data', 'ipl_data.csv')
 
 # Load data
-csv_path = download_and_unzip_data('https://github.com/WaseefKhalid/Cricklytics/raw/main/ipl_data.zip?raw=true')
+csv_path = download_and_unzip_data('https://github.com/WaseefKhalid/PSL_Analysis/raw/main/PSL_data.zip?raw=true')
 df = pd.read_csv(csv_path)
 
 st.set_page_config(
