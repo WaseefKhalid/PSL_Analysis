@@ -174,14 +174,16 @@ def effective_shots_on_different_grounds():
         # Plot Average Runs per Shot Type as Horizontal Bar Chart
         st.subheader('Average Runs per Shot Type')
         fig, ax = plt.subplots()
-        ax.barh(shot_analysis['shot'], shot_analysis['avg_runs'], color='skyblue')
-       for bar in bars:
-           width = bar.get_width()
-           ax.text(width, bar.get_y() + bar.get_height() / 2, 
-                   f'{width:.2f}',  # Format the value to 2 decimal places
-                   va='center', 
-                   ha='left', 
-                   color='black')
+        bars = ax.barh(shot_analysis['shot'], shot_analysis['avg_runs'], color='skyblue')
+
+        # Add exact values on top of the bars
+        for bar in bars:
+            width = bar.get_width()
+            ax.text(width, bar.get_y() + bar.get_height() / 2, 
+                    f'{width:.2f}',  # Format the value to 2 decimal places
+                    va='center', 
+                    ha='left', 
+                    color='black')
 
         ax.set_xlabel('Average Runs')
         ax.set_ylabel('Shot Type')
@@ -196,6 +198,7 @@ def effective_shots_on_different_grounds():
         ax.set_ylabel('Shot Type')
         ax.set_title('Dismissal Rate per Shot Type')
         st.pyplot(fig)
+
 
 
 def line_and_length():
