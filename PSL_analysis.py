@@ -211,9 +211,11 @@ def line_and_length():
             padding: 10px;
             border-radius: 5px;
             font-weight: bold;
+            text-align: center;
         }
         .blue-bg-yellow-text h1 {
             color: #FFD700 !important; /* Force yellow text */
+            font-size: 2.5em; /* Make the font size larger */
         }
         </style>
         """,
@@ -292,7 +294,12 @@ def line_and_length():
         # Drop the columns that are no longer necessary for display
         bowling_analysis = bowling_analysis.drop(columns=['bowlruns', 'ball', 'out'])
 
-        st.write('Bowling Analysis:', bowling_analysis)
+        # Option to select top N based on low economy rate
+        top_n = st.slider('Select top N based on low economy rate', min_value=1, max_value=len(bowling_analysis), value=5)
+        bowling_analysis = bowling_analysis.nsmallest(top_n, 'economy_rate')
+
+        st.write('Bowling Analysis (Top N based on Low Economy Rate):', bowling_analysis)
+
 
 
 
