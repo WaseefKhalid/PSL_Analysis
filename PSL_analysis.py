@@ -11,11 +11,10 @@ def download_and_unzip_data(url):
     response = requests.get(url)
     zip_file = BytesIO(response.content)
     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-        zip_ref.extractall('ipl_data')
-    return os.path.join('ipl_data', 'ipl_data.csv')
+        zip_ref.extractall('PSL_data')
+    return os.path.join('PSL_data', 'PSL_data.csv')
 
 # Load data
-csv_path = download_and_unzip_data('https://github.com/WaseefKhalid/PSL_Analysis/raw/main/PSL_data.zip?raw=true')
 df = pd.read_csv(csv_path)
 
 st.set_page_config(
