@@ -404,8 +404,14 @@ def batsman_swot():
         batsman_analysis['batting_avg'] = batsman_analysis['batting_avg'].round(2)
         batsman_analysis['strike_rate'] = batsman_analysis['strike_rate'].round(2)
         batsman_analysis['balls_per_dismissal'] = batsman_analysis['balls_per_dismissal'].round(2)
-        
-        st.write('Batsman Analysis:', batsman_analysis)
+
+        # Select top N based on low strike rate
+        top_n = st.slider('Select Top N Based on Lowest Strike Rate', min_value=1, max_value=len(batsman_analysis), value=5)
+        sorted_batsman_analysis = batsman_analysis.nsmallest(top_n, 'strike_rate')
+
+        # Display only selected columns
+        st.write('Batsman Analysis (Top N Based on Lowest SR):')
+        st.dataframe(sorted_batsman_analysis[['balls_per_dismissal', 'strike_rate', 'batting_avg']])
 
         st.subheader(f'{selected_batsman.title()} vs Selected Bowling Kind(s)')
         summary_df = batsman_filtered_df.groupby('bowl_kind').agg({
@@ -439,6 +445,7 @@ def batsman_swot():
 
             st.write('Summary of Performance Against Selected Bowling Styles:')
             st.dataframe(style_summary_df[['bowl_style', 'batting_avg', 'strike_rate', 'out']])
+
 
 def toss_and_match_outcome_analysis():
     # CSS for blue background and yellow text
