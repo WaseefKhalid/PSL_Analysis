@@ -547,7 +547,10 @@ def batsman_profile_analysis():
     # Title with blue background and yellow text
     st.markdown('<div class="blue-bg-yellow-text"><h1>Batsman Profile Analysis</h1></div>', unsafe_allow_html=True)
 
-    filtered_df = df.groupby('bat').filter(lambda x: x['ball'].count() >= 300)
+    # Ensure 'ball_id' column exists and calculate 'Phase'
+    if 'ball_id' not in df.columns:
+        st.error("Column 'ball_id' not found in the dataset.")
+        return
 
     def determine_phase(ball_id):
         if ball_id <= 6:
@@ -557,11 +560,14 @@ def batsman_profile_analysis():
         else:
             return 'Death'
 
-    filtered_df['Phase'] = filtered_df['ball_id'].apply(determine_phase)
+    df['Phase'] = df['ball_id'].apply(determine_phase)
 
     # Ensure 'Phase' is ordered correctly
     phase_order = ['Powerplay', 'Middle', 'Death']
-    filtered_df['Phase'] = pd.Categorical(filtered_df['Phase'], categories=phase_order, ordered=True)
+    df['Phase'] = pd.Categorical(df['Phase'], categories=phase_order, ordered=True)
+
+    # Filter batsmen who have faced more than 300 balls
+    filtered_df = df.groupby('bat').filter(lambda x: x['ball'].count() >= 300)
 
     search_term = st.text_input("Start typing the name of the batsman:")
     filtered_batsmen = filtered_df['bat'].str.lower().unique()
@@ -569,7 +575,6 @@ def batsman_profile_analysis():
     selected_batsman = st.selectbox("Select Batsman", options=filtered_suggestions, format_func=lambda x: x.title())
 
     if selected_batsman:
-        # Apply selected batsman
         batsman_name = selected_batsman.lower()
 
         # Ground filter activation
@@ -600,6 +605,13 @@ def batsman_profile_analysis():
             if player_df.empty:
                 st.write(f"No data available for {batsman_name.title()} or the player has not faced 300 balls.")
                 return
+
+            # Check if required columns exist in player_df
+            required_columns = ['batruns', 'ball', 'isSix', 'isFour', 'isDot', 'ActivityRuns', 'control']
+            for column in required_columns:
+                if column not in player_df.columns:
+                    st.error(f"Column '{column}' not found in the dataset.")
+                    return
 
             # Calculate metrics
             sr_phase_wise = player_df.groupby('Phase').apply(lambda x: (x['batruns'].sum() / x['ball'].count()) * 100).reset_index()
