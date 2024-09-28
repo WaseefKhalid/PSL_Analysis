@@ -20,7 +20,7 @@ csv_path = download_and_unzip_data('https://github.com/WaseefKhalid/PSL_Analysis
 df = pd.read_csv(csv_path)
 
 st.set_page_config(
-    page_title="Cricklytics-Verse",  # This sets the title of the tab in the browser
+    page_title="Cricklytics-Verse-PSL",  # This sets the title of the tab in the browser
     page_icon="🏏",  # Optional: You can set an icon for your app
     layout="centered",  # Optional: You can set the layout ('centered' or 'wide')
     initial_sidebar_state="auto",  # Optional: You can set the sidebar state
