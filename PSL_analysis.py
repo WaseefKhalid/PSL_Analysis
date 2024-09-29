@@ -733,6 +733,10 @@ def bowler_profile_analysis():
             non_control_percentage_phase_wise = player_df.groupby('Phase').apply(lambda x: round(((x['ball'].count() - x['control'].sum()) / x['ball'].count()) * 100, 2)).reset_index()
             non_control_percentage_phase_wise.columns = ['Phase', 'Non-Control %']
 
+            # Calculate dot ball percentage
+            dot_ball_percentage_phase_wise = player_df.groupby('Phase').apply(lambda x: round((x['isDot'].sum() / x['ball'].count()) * 100, 2)).reset_index()
+            dot_ball_percentage_phase_wise.columns = ['Phase', 'Dot Ball %']
+
             # Display the analysis side by side
             st.write(f"Bowler Profile: {bowler_name.title()}")
 
@@ -745,6 +749,9 @@ def bowler_profile_analysis():
                 st.write("### Wickets per Ball:")
                 st.table(wickets_per_ball_phase_wise.sort_values('Phase'))
 
+                st.write("### Dot Ball Percentage:")
+                st.table(dot_ball_percentage_phase_wise.sort_values('Phase'))
+
             with col2:
                 st.write("### Bowling Average:")
                 st.table(bowling_avg_phase_wise.sort_values('Phase'))
@@ -753,6 +760,7 @@ def bowler_profile_analysis():
                 st.table(non_control_percentage_phase_wise.sort_values('Phase'))
 
         bowler_profile()
+
 
 
 
