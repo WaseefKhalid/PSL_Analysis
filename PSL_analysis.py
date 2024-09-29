@@ -563,8 +563,8 @@ def batsman_profile_analysis():
     phase_order = ['Powerplay', 'Middle', 'Death']
     filtered_df['Phase'] = pd.Categorical(filtered_df['Phase'], categories=phase_order, ordered=True)
 
-    search_term = st.text_input("Start typing the name of the batsman:")
-    filtered_batsmen = filtered_df['bat'].str.lower().unique()
+    # search_term = st.text_input("Start typing the name of the batsman:")
+    # filtered_batsmen = filtered_df['bat'].str.lower().unique()
     filtered_suggestions = [bat for bat in filtered_batsmen if search_term.lower() in bat]
     selected_batsman = st.selectbox("Select Batsman", options=filtered_suggestions, format_func=lambda x: x.title())
 
