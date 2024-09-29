@@ -547,8 +547,10 @@ def batsman_profile_analysis():
     # Title with blue background and yellow text
     st.markdown('<div class="blue-bg-yellow-text"><h1>Batsman Profile Analysis</h1></div>', unsafe_allow_html=True)
 
+    # Filter to include batsmen who have faced at least 300 balls
     filtered_df = df.groupby('bat').filter(lambda x: x['ball'].count() >= 300)
 
+    # Define the phase of play based on ball_id
     def determine_phase(ball_id):
         if ball_id <= 6:
             return 'Powerplay'
@@ -563,14 +565,12 @@ def batsman_profile_analysis():
     phase_order = ['Powerplay', 'Middle', 'Death']
     filtered_df['Phase'] = pd.Categorical(filtered_df['Phase'], categories=phase_order, ordered=True)
 
-   # search_term = st.text_input("Start typing the name of the batsman:")
-    filtered_batsmen = filtered_df['bat'].str.lower().unique()
-    filtered_suggestions = [bat for bat in filtered_batsmen if search_term.lower() in bat]
-    selected_batsman = st.selectbox("Select Batsman", options=filtered_suggestions, format_func=lambda x: x.title())
+    # Use only a select box to select batsman
+    batsman_name = st.selectbox("Select Batsman", options=sorted(filtered_df['bat'].str.title().unique()))
 
-    if selected_batsman:
-        # Apply selected batsman
-        batsman_name = selected_batsman.lower()
+    if batsman_name:
+        # Convert the selected batsman to lowercase for further filtering
+        batsman_name = batsman_name.lower()
 
         # Ground filter activation
         activate_ground_filter = st.checkbox("Activate Ground Filter")
@@ -593,6 +593,7 @@ def batsman_profile_analysis():
             if selected_bowling_styles:
                 filtered_df = filtered_df[filtered_df['bowl_style'].isin(selected_bowling_styles)]
 
+        # Define player profile for the selected batsman
         def player_profile(batsman_name):
             filtered_df['bat'] = filtered_df['bat'].str.lower()
             player_df = filtered_df[filtered_df['bat'] == batsman_name]
@@ -648,6 +649,7 @@ def batsman_profile_analysis():
                 st.write("### Control Percentage:")
                 st.table(control_phase_wise)
 
+        # Call the player profile function
         player_profile(batsman_name)
 
 
