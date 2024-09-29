@@ -654,47 +654,107 @@ def batsman_profile_analysis():
 
 
 
-def bowler_profile():
-    player_df = filtered_df[filtered_df['bowl'] == bowler_name]
-    
-    if player_df.empty:
-        st.write(f"No data available for {bowler_name.title()} or the player has not bowled 300 balls.")
-        return
-    
-    # Calculate metrics and round to two decimal places
-    economy_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['bowlruns'].sum() / (x['ball'].count() / 6), 2)).reset_index()
-    economy_phase_wise.columns = ['Phase', 'Economy Rate']
-    
-    bowling_avg_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['bowlruns'].sum() / x['out'].sum(), 2) if x['out'].sum() > 0 else 0).reset_index()
-    bowling_avg_phase_wise.columns = ['Phase', 'Bowling Avg']
-    
-    wickets_per_ball_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['ball'].count() / x['out'].sum(), 2) if x['out'].sum() > 0 else 0).reset_index()
-    wickets_per_ball_phase_wise.columns = ['Phase', 'Wickets per Ball']
+def bowler_profile_analysis():
+    # CSS for blue background and yellow text
+    st.markdown(
+        """
+        <style>
+        .blue-bg-yellow-text {
+            background-color: #007BFF; /* Blue background */
+            color: #FFD700; /* Yellow text */
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .blue-bg-yellow-text h1 {
+            color: #FFD700 !important; /* Force yellow text */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-    non_control_percentage_phase_wise = player_df.groupby('Phase').apply(lambda x: round(((x['ball'].count() - x['control'].sum()) / x['ball'].count()) * 100, 2)).reset_index()
-    non_control_percentage_phase_wise.columns = ['Phase', 'Non-Control %']
+    # Title with blue background and yellow text
+    st.markdown('<div class="blue-bg-yellow-text"><h1>Bowler Profile Analysis</h1></div>', unsafe_allow_html=True)
 
-    # Display the analysis side by side
-    st.write(f"Bowler Profile: {bowler_name.title()}")
+    filtered_df = df.groupby('bowl').filter(lambda x: x['ball'].count() >= 300)
 
-    col1, col2 = st.columns(2)
+    def determine_phase(ball_id):
+        if ball_id <= 6:
+            return 'Powerplay'
+        elif ball_id <= 15:
+            return 'Middle'
+        else:
+            return 'Death'
 
-    with col1:
-        st.write("### Economy Rate:")
-        st.table(economy_phase_wise.sort_values('Phase'))
+    filtered_df['Phase'] = filtered_df['ball_id'].apply(determine_phase)
+    filtered_df['bowl'] = filtered_df['bowl'].str.lower()
 
-        st.write("### Wickets per Ball:")
-        st.table(wickets_per_ball_phase_wise.sort_values('Phase'))
+    # Define the phase order
+    phase_order = ['Powerplay', 'Middle', 'Death']
+    filtered_df['Phase'] = pd.Categorical(filtered_df['Phase'], categories=phase_order, ordered=True)
 
-    with col2:
-        st.write("### Bowling Average:")
-        st.table(bowling_avg_phase_wise.sort_values('Phase'))
+    bowler_names = filtered_df['bowl'].str.title().unique()
+    bowler_name = st.selectbox("Enter or select the name of the bowler:", options=sorted(bowler_names))
 
-        st.write("### Non-Control Percentage:")
-        st.table(non_control_percentage_phase_wise.sort_values('Phase'))
+    if bowler_name:
+        # Apply the selected bowler name
+        bowler_name = bowler_name.lower()
 
-# Ensure bowler_name is defined properly
-bowler_profile()
+        # Ground filter activation (now placed after bowler selection)
+        activate_ground_filter = st.checkbox("Activate Ground Filter")
+        if activate_ground_filter:
+            selected_ground = st.selectbox("Select Ground", options=filtered_df['ground'].unique())
+            filtered_df = filtered_df[(filtered_df['ground'] == selected_ground) & (filtered_df['bowl'] == bowler_name)]
+
+        # Batting hand filter activation (now placed after bowler selection)
+        activate_bat_hand_filter = st.checkbox("Activate Batting Hand Filter")
+        if activate_bat_hand_filter:
+            selected_bat_hand = st.selectbox("Select Batting Hand", options=filtered_df['bat_hand'].unique())
+            filtered_df = filtered_df[(filtered_df['bat_hand'] == selected_bat_hand) & (filtered_df['bowl'] == bowler_name)]
+
+        def bowler_profile():
+            player_df = filtered_df[filtered_df['bowl'] == bowler_name]
+            
+            if player_df.empty:
+                st.write(f"No data available for {bowler_name.title()} or the player has not bowled 300 balls.")
+                return
+            
+            # Calculate metrics and round to two decimal places
+            economy_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['bowlruns'].sum() / (x['ball'].count() / 6), 2)).reset_index()
+            economy_phase_wise.columns = ['Phase', 'Economy Rate']
+            
+            bowling_avg_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['bowlruns'].sum() / x['out'].sum(), 2) if x['out'].sum() > 0 else 0).reset_index()
+            bowling_avg_phase_wise.columns = ['Phase', 'Bowling Avg']
+            
+            wickets_per_ball_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['ball'].count() / x['out'].sum(), 2) if x['out'].sum() > 0 else 0).reset_index()
+            wickets_per_ball_phase_wise.columns = ['Phase', 'Wickets per Ball']
+
+            non_control_percentage_phase_wise = player_df.groupby('Phase').apply(lambda x: round(((x['ball'].count() - x['control'].sum()) / x['ball'].count()) * 100, 2)).reset_index()
+            non_control_percentage_phase_wise.columns = ['Phase', 'Non-Control %']
+
+            # Display the analysis side by side
+            st.write(f"Bowler Profile: {bowler_name.title()}")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.write("### Economy Rate:")
+                st.table(economy_phase_wise.sort_values('Phase'))
+
+                st.write("### Wickets per Ball:")
+                st.table(wickets_per_ball_phase_wise.sort_values('Phase'))
+
+            with col2:
+                st.write("### Bowling Average:")
+                st.table(bowling_avg_phase_wise.sort_values('Phase'))
+
+                st.write("### Non-Control Percentage:")
+                st.table(non_control_percentage_phase_wise.sort_values('Phase'))
+
+        bowler_profile()
+
+
 
 # CSS for sidebar radio buttons
 st.markdown(
