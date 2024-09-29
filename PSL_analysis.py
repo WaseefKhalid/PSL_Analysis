@@ -652,6 +652,8 @@ def batsman_profile_analysis():
 
 
 
+
+
 def bowler_profile():
     player_df = filtered_df[filtered_df['bowl'] == bowler_name]
     
@@ -698,6 +700,8 @@ def bowler_profile():
         st.write("### Dot Percentage:")
         st.table(dot_percentage_phase_wise.sort_values('Phase'))
 
+# Correct call to the function
+bowler_profile()
 
 # CSS for sidebar radio buttons
 st.markdown(
