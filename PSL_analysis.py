@@ -655,45 +655,47 @@ def batsman_profile_analysis():
 
 
 def bowler_profile():
-            player_df = filtered_df[filtered_df['bowl'] == bowler_name]
-            
-            if player_df.empty:
-                st.write(f"No data available for {bowler_name.title()} or the player has not bowled 300 balls.")
-                return
-            
-            # Calculate metrics and round to two decimal places
-            economy_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['bowlruns'].sum() / (x['ball'].count() / 6), 2)).reset_index()
-            economy_phase_wise.columns = ['Phase', 'Economy Rate']
-            
-            bowling_avg_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['bowlruns'].sum() / x['out'].sum(), 2) if x['out'].sum() > 0 else 0).reset_index()
-            bowling_avg_phase_wise.columns = ['Phase', 'Bowling Avg']
-            
-            wickets_per_ball_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['ball'].count() / x['out'].sum(), 2) if x['out'].sum() > 0 else 0).reset_index()
-            wickets_per_ball_phase_wise.columns = ['Phase', 'Wickets per Ball']
+    player_df = filtered_df[filtered_df['bowl'] == bowler_name]
+    
+    if player_df.empty:
+        st.write(f"No data available for {bowler_name.title()} or the player has not bowled 300 balls.")
+        return
+    
+    # Calculate metrics and round to two decimal places
+    economy_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['bowlruns'].sum() / (x['ball'].count() / 6), 2)).reset_index()
+    economy_phase_wise.columns = ['Phase', 'Economy Rate']
+    
+    bowling_avg_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['bowlruns'].sum() / x['out'].sum(), 2) if x['out'].sum() > 0 else 0).reset_index()
+    bowling_avg_phase_wise.columns = ['Phase', 'Bowling Avg']
+    
+    wickets_per_ball_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['ball'].count() / x['out'].sum(), 2) if x['out'].sum() > 0 else 0).reset_index()
+    wickets_per_ball_phase_wise.columns = ['Phase', 'Wickets per Ball']
 
-            non_control_percentage_phase_wise = player_df.groupby('Phase').apply(lambda x: round(((x['ball'].count() - x['control'].sum()) / x['ball'].count()) * 100, 2)).reset_index()
-            non_control_percentage_phase_wise.columns = ['Phase', 'Non-Control %']
+    non_control_percentage_phase_wise = player_df.groupby('Phase').apply(lambda x: round(((x['ball'].count() - x['control'].sum()) / x['ball'].count()) * 100, 2)).reset_index()
+    non_control_percentage_phase_wise.columns = ['Phase', 'Non-Control %']
 
-            # Display the analysis side by side
-            st.write(f"Bowler Profile: {bowler_name.title()}")
+    # Display the analysis side by side
+    st.write(f"Bowler Profile: {bowler_name.title()}")
 
-            col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-            with col1:
-                st.write("### Economy Rate:")
-                st.table(economy_phase_wise.sort_values('Phase'))
+    with col1:
+        st.write("### Economy Rate:")
+        st.table(economy_phase_wise.sort_values('Phase'))
 
-                st.write("### Wickets per Ball:")
-                st.table(wickets_per_ball_phase_wise.sort_values('Phase'))
+        st.write("### Wickets per Ball:")
+        st.table(wickets_per_ball_phase_wise.sort_values('Phase'))
 
-            with col2:
-                st.write("### Bowling Average:")
-                st.table(bowling_avg_phase_wise.sort_values('Phase'))
+    with col2:
+        st.write("### Bowling Average:")
+        st.table(bowling_avg_phase_wise.sort_values('Phase'))
 
-                st.write("### Non-Control Percentage:")
-                st.table(non_control_percentage_phase_wise.sort_values('Phase'))
+        st.write("### Non-Control Percentage:")
+        st.table(non_control_percentage_phase_wise.sort_values('Phase'))
 
-        bowler_profile()
+# Ensure bowler_name is defined properly
+bowler_profile()
+
 # CSS for sidebar radio buttons
 st.markdown(
     """
