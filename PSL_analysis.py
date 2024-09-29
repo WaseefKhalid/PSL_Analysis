@@ -652,66 +652,7 @@ def batsman_profile_analysis():
 
 
 
-def bowler_profile_analysis():
-    # CSS for blue background and yellow text
-    st.markdown(
-        """
-        <style>
-        .blue-bg-yellow-text {
-            background-color: #007BFF; /* Blue background */
-            color: #FFD700; /* Yellow text */
-            padding: 10px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .blue-bg-yellow-text h1 {
-            color: #FFD700 !important; /* Force yellow text */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Title with blue background and yellow text
-    st.markdown('<div class="blue-bg-yellow-text"><h1>Bowler Profile Analysis</h1></div>', unsafe_allow_html=True)
-
-    filtered_df = df.groupby('bowl').filter(lambda x: x['ball'].count() >= 300)
-
-    def determine_phase(ball_id):
-        if ball_id <= 6:
-            return 'Powerplay'
-        elif ball_id <= 15:
-            return 'Middle'
-        else:
-            return 'Death'
-
-    filtered_df['Phase'] = filtered_df['ball_id'].apply(determine_phase)
-    filtered_df['bowl'] = filtered_df['bowl'].str.lower()
-
-    # Define the phase order
-    phase_order = ['Powerplay', 'Middle', 'Death']
-    filtered_df['Phase'] = pd.Categorical(filtered_df['Phase'], categories=phase_order, ordered=True)
-
-    bowler_names = filtered_df['bowl'].str.title().unique()
-    bowler_name = st.selectbox("Enter or select the name of the bowler:", options=sorted(bowler_names))
-
-    if bowler_name:
-        # Apply the selected bowler name
-        bowler_name = bowler_name.lower()
-
-        # Ground filter activation (now placed after bowler selection)
-        activate_ground_filter = st.checkbox("Activate Ground Filter")
-        if activate_ground_filter:
-            selected_ground = st.selectbox("Select Ground", options=filtered_df['ground'].unique())
-            filtered_df = filtered_df[(filtered_df['ground'] == selected_ground) & (filtered_df['bowl'] == bowler_name)]
-
-        # Batting hand filter activation (now placed after bowler selection)
-        activate_bat_hand_filter = st.checkbox("Activate Batting Hand Filter")
-        if activate_bat_hand_filter:
-            selected_bat_hand = st.selectbox("Select Batting Hand", options=filtered_df['bat_hand'].unique())
-            filtered_df = filtered_df[(filtered_df['bat_hand'] == selected_bat_hand) & (filtered_df['bowl'] == bowler_name)]
-
-        def bowler_profile():
+def bowler_profile():
     player_df = filtered_df[filtered_df['bowl'] == bowler_name]
     
     if player_df.empty:
@@ -756,8 +697,6 @@ def bowler_profile_analysis():
 
         st.write("### Dot Percentage:")
         st.table(dot_percentage_phase_wise.sort_values('Phase'))
-
-bowler_profile()
 
 
 # CSS for sidebar radio buttons
