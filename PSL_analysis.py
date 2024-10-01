@@ -1010,4 +1010,4 @@ elif analysis_type == "Player Batting Profiles":
 elif analysis_type == "Player Bowling Profiles":
     bowler_profile_analysis()
 elif analysis_type == "Match-UP Analysis":
-     match_up_analysis():
+     match_up_analysis()
