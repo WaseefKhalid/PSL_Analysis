@@ -7,6 +7,27 @@ from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+def add_bg_from_url():
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background-image: url("https://stock.adobe.com/images/sport-stadium-at-night-as-wide-backdrop-digital-3d-illustration-for-background-advertisement/369503958");
+            background-size: cover;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+add_bg_from_url()
+
+# Your Streamlit content goes here
+st.title("This is a Streamlit app with a background image!")
+
+
+
 def download_and_unzip_data(url):
     response = requests.get(url)
     zip_file = BytesIO(response.content)
