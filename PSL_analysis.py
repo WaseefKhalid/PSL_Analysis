@@ -1031,26 +1031,79 @@ def line_length_dismissal_matrix():
     # Title with blue background and yellow text
     st.markdown('<div class="blue-bg-yellow-text"><h1>Bowler\'s Line-Length Dismissal Matrix</h1></div>', unsafe_allow_html=True)
 
-    # Select bowler
-    bowler_name = st.selectbox("Select Bowler", options=sorted(df['bowl'].str.title().unique()))
+    # Option to choose between bowler-batsman match-up or bowling kind analysis
+    analysis_type = st.radio(
+        "Select the type of analysis:",
+        ('Bowler vs Batsman Dismissals', 'Batsman Dismissals by Bowling Kind')
+    )
 
-    if bowler_name:
-        # Convert to lowercase and strip spaces for consistent filtering
-        bowler_name_cleaned = bowler_name.lower().strip()
+    if analysis_type == 'Bowler vs Batsman Dismissals':
+        # Bowler-Batsman match-up
+        bowler_name = st.selectbox("Select Bowler", options=sorted(df['bowl'].str.title().unique()))
 
-        # Select batsman
+        if bowler_name:
+            # Convert to lowercase and strip spaces for consistent filtering
+            bowler_name_cleaned = bowler_name.lower().strip()
+
+            batsman_name = st.selectbox("Select Batsman", options=sorted(df['bat'].str.title().unique()))
+
+            if batsman_name:
+                # Convert to lowercase and strip spaces for consistent filtering
+                batsman_name_cleaned = batsman_name.lower().strip()
+
+                # Filter the dataset for the selected bowler and batsman
+                match_up_df = df[(df['bowl'].str.lower().str.strip() == bowler_name_cleaned) &
+                                 (df['bat'].str.lower().str.strip() == batsman_name_cleaned)]
+
+                if match_up_df.empty:
+                    st.error(f"No data available for the match-up between {batsman_name.title()} and {bowler_name.title()}.")
+                else:
+                    # Group the data by line and length, then sum up dismissals (outs)
+                    line_length_dismissal_data = match_up_df.groupby(['line', 'length']).agg({'out': 'sum'}).reset_index()
+
+                    # Create a scatter plot
+                    plt.figure(figsize=(10, 6))
+                    scatter = plt.scatter(
+                        line_length_dismissal_data['line'],
+                        line_length_dismissal_data['length'],
+                        s=line_length_dismissal_data['out'] * 100,  # Adjust the size based on the number of dismissals
+                        c=line_length_dismissal_data['out'],
+                        cmap='coolwarm', alpha=0.7, edgecolors='w'
+                    )
+
+                    # Add labels and title
+                    plt.title(f'Dismissals by Line and Length: {bowler_name.title()} vs {batsman_name.title()}', fontsize=16)
+                    plt.xlabel('Line', fontsize=12)
+                    plt.ylabel('Length', fontsize=12)
+
+                    # Add color bar to show dismissal intensity
+                    plt.colorbar(scatter, label='Number of Dismissals')
+
+                    # Annotate the scatter points with dismissal numbers
+                    for i, txt in enumerate(line_length_dismissal_data['out']):
+                        plt.annotate(txt, (line_length_dismissal_data['line'][i], line_length_dismissal_data['length'][i]),
+                                     textcoords="offset points", xytext=(0, 5), ha='center')
+
+                    # Show the plot
+                    st.pyplot(plt)
+
+    elif analysis_type == 'Batsman Dismissals by Bowling Kind':
+        # Batsman dismissals based on bowling kind
         batsman_name = st.selectbox("Select Batsman", options=sorted(df['bat'].str.title().unique()))
 
         if batsman_name:
             # Convert to lowercase and strip spaces for consistent filtering
             batsman_name_cleaned = batsman_name.lower().strip()
 
-            # Filter the dataset for the selected bowler and batsman
-            match_up_df = df[(df['bowl'].str.lower().str.strip() == bowler_name_cleaned) &
-                             (df['bat'].str.lower().str.strip() == batsman_name_cleaned)]
+            # Select the bowling kind
+            bowling_kind = st.selectbox("Select Bowling Kind", options=sorted(df['bowl_kind'].unique()))
+
+            # Filter the dataset for the selected batsman and bowling kind
+            match_up_df = df[(df['bat'].str.lower().str.strip() == batsman_name_cleaned) &
+                             (df['bowl_kind'] == bowling_kind)]
 
             if match_up_df.empty:
-                st.error(f"No data available for the match-up between {batsman_name.title()} and {bowler_name.title()}.")
+                st.error(f"No data available for {batsman_name.title()} against {bowling_kind}.")
             else:
                 # Group the data by line and length, then sum up dismissals (outs)
                 line_length_dismissal_data = match_up_df.groupby(['line', 'length']).agg({'out': 'sum'}).reset_index()
@@ -1064,9 +1117,9 @@ def line_length_dismissal_matrix():
                     c=line_length_dismissal_data['out'],
                     cmap='coolwarm', alpha=0.7, edgecolors='w'
                 )
-                
+
                 # Add labels and title
-                plt.title(f'Dismissals by Line and Length: {bowler_name.title()} vs {batsman_name.title()}', fontsize=16)
+                plt.title(f'Dismissals by Line and Length: {batsman_name.title()} vs {bowling_kind}', fontsize=16)
                 plt.xlabel('Line', fontsize=12)
                 plt.ylabel('Length', fontsize=12)
 
