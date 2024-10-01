@@ -1087,6 +1087,14 @@ def line_length_dismissal_matrix():
                     # Show the plot
                     st.pyplot(plt)
 
+                    # Show detailed dismissal description
+                    st.markdown("### Dismissal Descriptions")
+                    for idx, row in match_up_df.iterrows():
+                        line = row['line']
+                        length = row['length']
+                        dismissal = row['dismissal']
+                        st.markdown(f"- **{batsman_name.title()}** was dismissed by **{bowler_name.title()}** with a **{dismissal}** at line **{line}** and length **{length}**.")
+
     elif analysis_type == 'Batsman Dismissals by Bowling Style':
         # Batsman dismissals based on bowling style
         batsman_name = st.selectbox("Select Batsman", options=sorted(df['bat'].str.title().unique()))
@@ -1133,6 +1141,14 @@ def line_length_dismissal_matrix():
 
                 # Show the plot
                 st.pyplot(plt)
+
+                # Show detailed dismissal description
+                st.markdown("### Dismissal Descriptions")
+                for idx, row in match_up_df.iterrows():
+                    line = row['line']
+                    length = row['length']
+                    dismissal = row['dismissal']
+                    st.markdown(f"- **{batsman_name.title()}** was dismissed by a **{bowling_style}** bowler with a **{dismissal}** at line **{line}** and length **{length}**.")
 
 
 
