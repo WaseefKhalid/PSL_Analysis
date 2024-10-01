@@ -679,6 +679,7 @@ def bowler_profile_analysis():
     # Title with blue background and yellow text
     st.markdown('<div class="blue-bg-yellow-text"><h1>Bowler Profile Analysis</h1></div>', unsafe_allow_html=True)
 
+    # Filter data to include bowlers who have bowled at least 300 balls
     filtered_df = df.groupby('bowl').filter(lambda x: x['ball'].count() >= 300)
 
     def determine_phase(ball_id):
@@ -696,6 +697,14 @@ def bowler_profile_analysis():
     phase_order = ['Powerplay', 'Middle', 'Death']
     filtered_df['Phase'] = pd.Categorical(filtered_df['Phase'], categories=phase_order, ordered=True)
 
+    # Add a multiselect filter for years
+    selected_years = st.multiselect("Select Year(s)", options=sorted(filtered_df['year'].unique()))
+    
+    # Filter based on selected years
+    if selected_years:
+        filtered_df = filtered_df[filtered_df['year'].isin(selected_years)]
+
+    # Bowler selection
     bowler_names = filtered_df['bowl'].str.title().unique()
     bowler_name = st.selectbox("Enter or select the name of the bowler:", options=sorted(bowler_names))
 
