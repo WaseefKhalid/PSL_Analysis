@@ -11,15 +11,15 @@ import matplotlib.pyplot as plt
 
 
 
-st.set_page_config(page_title="PSL Analysis", page_icon="🏏", layout="wide")
+t.set_page_config(page_title="PSL Analysis", page_icon="🏏", layout="wide")
 
-# Your app content goes here
+# Your application code goes below
 def add_bg_from_url():
     st.markdown(
         """
         <style>
         .stApp {
-            background-image: url("https://stock.adobe.com/images/sport-stadium-at-night-as-wide-backdrop-digital-3d-illustration-for-background-advertisement/369503958");
+            background-image: url("https://www.example.com/your-image-url.jpg");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -30,7 +30,7 @@ def add_bg_from_url():
         unsafe_allow_html=True
     )
 
-# Call background image function
+# Add the background image
 add_bg_from_url()
 
 
