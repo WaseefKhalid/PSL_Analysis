@@ -849,18 +849,23 @@ def match_up_analysis():
     bowler_name = st.selectbox("Select Bowler", options=sorted(df['bowl'].str.title().unique()))
 
     if bowler_name:
-        # Convert to lowercase for consistent filtering
-        bowler_name = bowler_name.lower()
+        # Convert to lowercase and strip spaces for consistent filtering
+        bowler_name_cleaned = bowler_name.lower().strip()
 
         # Select batsman
         batsman_name = st.selectbox("Select Batsman", options=sorted(df['bat'].str.title().unique()))
 
         if batsman_name:
-            # Convert to lowercase for consistent filtering
-            batsman_name = batsman_name.lower()
+            # Convert to lowercase and strip spaces for consistent filtering
+            batsman_name_cleaned = batsman_name.lower().strip()
 
-            # Filter the dataset based on selected bowler and batsman
-            match_up_df = df[(df['bowl'] == bowler_name) & (df['bat'] == batsman_name)]
+            # Filter the dataset where the selected bowler is bowling to the selected batsman
+            match_up_df = df[(df['bowl'].str.lower().str.strip() == bowler_name_cleaned) &
+                             (df['bat'].str.lower().str.strip() == batsman_name_cleaned)]
+
+            # Debugging: display the first few rows of the filtered dataset
+            st.write("Filtered Dataset Preview (First 5 rows):")
+            st.write(match_up_df.head())  # Show first 5 rows to check if the data is filtered correctly
 
             if match_up_df.empty:
                 st.error(f"No data available for the match-up between {batsman_name.title()} and {bowler_name.title()}.")
@@ -926,8 +931,6 @@ def match_up_analysis():
                 phase_wise_data.columns = ['Phase', 'Runs', 'Balls Faced', 'Wickets Taken', 'Strike Rate', 'Economy Rate']
 
                 st.table(phase_wise_data)
-
-
 
 
 # CSS for sidebar radio buttons
