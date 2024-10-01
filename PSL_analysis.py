@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 
-t.set_page_config(page_title="PSL Analysis", page_icon="🏏", layout="wide")
+st.set_page_config(page_title="PSL Analysis", page_icon="🏏", layout="wide")
 
 # Your application code goes below
 def add_bg_from_url():
