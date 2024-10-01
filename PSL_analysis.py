@@ -89,7 +89,7 @@ def home_section():
             <li>Line & Length Dismissal Matrix</li>
             <li>Batsman Strength & Weakness</li>
             <li>Bolwing Line & Length Insights</li>
-            <li>Best Shots By Ground </li>
+            <li>Best Shots By Ground</li>
             <li>Toss Impact </li>
         </ul>
         <p>Select any section from the sidebar to get started!</p>
@@ -1175,7 +1175,7 @@ analysis_type = st.sidebar.radio("Choose the analysis", [
 # Display the selected analysis section
 if analysis_type == "Home":
     home_section()
-elif analysis_type == "Best Shots by Ground":
+elif analysis_type == "Best Shots By Ground":
     effective_shots_on_different_grounds()
 elif analysis_type == "Bolwing Line & Length Insights":
     line_and_length()
