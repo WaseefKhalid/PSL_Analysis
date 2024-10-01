@@ -91,6 +91,7 @@ def home_section():
             <li>Player Bowling Profile</li>
             <li>Match-UP Analysis </li>
             <li>Line & Length Dissmissal Matrix </li>
+            <li>MVP of PSL </li>
         </ul>
         <p>Select any section from the sidebar to get started!</p>
         </div>
@@ -1083,6 +1084,66 @@ def line_length_dismissal_matrix():
                 # Show the plot
                 st.pyplot(plt)
 
+def mvp_of_psl():
+    st.markdown(
+        """
+        <style>
+        .blue-bg-yellow-text {
+            background-color: #007BFF; /* Blue background */
+            color: #FFD700; /* Yellow text */
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .blue-bg-yellow-text h1 {
+            color: #FFD700 !important; /* Force yellow text */
+            font-size: 2.5em; /* Make the font size larger */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Title with blue background and yellow text
+    st.markdown('<div class="blue-bg-yellow-text"><h1>MVP of PSL</h1></div>', unsafe_allow_html=True)
+
+    # Top N for Economy Rate (Bowler)
+    st.subheader("Top N Players with Lowest Economy Rate (Bowler)")
+    top_n_eco = st.slider('Select Top N for Economy Rate', min_value=1, max_value=20, value=5, key='eco_rate_n')
+    top_eco_df = df.groupby('bowl').agg({'bowlruns': 'sum', 'ball': 'count'}).reset_index()
+    top_eco_df['economy_rate'] = top_eco_df['bowlruns'] / (top_eco_df['ball'] / 6)
+    top_eco_df = top_eco_df[['bowl', 'economy_rate']].nsmallest(top_n_eco, 'economy_rate')
+    st.write(top_eco_df)
+
+    # Top N for Strike Rate (Batsman)
+    st.subheader("Top N Players with Highest Batting Strike Rate (Batsman)")
+    top_n_sr = st.slider('Select Top N for Batting Strike Rate', min_value=1, max_value=20, value=5, key='sr_n')
+    top_sr_df = df.groupby('bat').agg({'batruns': 'sum', 'ball': 'count'}).reset_index()
+    top_sr_df['strike_rate'] = (top_sr_df['batruns'] / top_sr_df['ball']) * 100
+    top_sr_df = top_sr_df[['bat', 'strike_rate']].nlargest(top_n_sr, 'strike_rate')
+    st.write(top_sr_df)
+
+    # Top N for Most Dot Balls (Bowler)
+    st.subheader("Top N Players with Most Dot Balls (Bowler)")
+    top_n_dot = st.slider('Select Top N for Dot Balls', min_value=1, max_value=20, value=5, key='dot_balls_n')
+    top_dot_df = df.groupby('bowl').agg({'isDot': 'sum'}).reset_index()
+    top_dot_df = top_dot_df[['bowl', 'isDot']].nlargest(top_n_dot, 'isDot')
+    st.write(top_dot_df)
+
+    # Top N for Most Sixes (Batsman)
+    st.subheader("Top N Players with Most Sixes (Batsman)")
+    top_n_six = st.slider('Select Top N for Most Sixes', min_value=1, max_value=20, value=5, key='six_n')
+    top_six_df = df.groupby('bat').agg({'isSix': 'sum'}).reset_index()
+    top_six_df = top_six_df[['bat', 'isSix']].nlargest(top_n_six, 'isSix')
+    st.write(top_six_df)
+
+    # Top N for Most Fours (Batsman)
+    st.subheader("Top N Players with Most Fours (Batsman)")
+    top_n_four = st.slider('Select Top N for Most Fours', min_value=1, max_value=20, value=5, key='four_n')
+    top_four_df = df.groupby('bat').agg({'isFour': 'sum'}).reset_index()
+    top_four_df = top_four_df[['bat', 'isFour']].nlargest(top_n_four, 'isFour')
+    st.write(top_four_df)
+
 
 
 
@@ -1149,7 +1210,8 @@ analysis_type = st.sidebar.radio("Choose the analysis", [
     "Player Batting Profiles",
     "Player Bowling Profiles",
     "Match-UP Analysis",
-    "Line & Length Dismissal Matrix"
+    "Line & Length Dismissal Matrix",
+    "MVP of PSL"
 ])
 
 # Display the selected analysis section
@@ -1171,4 +1233,6 @@ elif analysis_type == "Match-UP Analysis":
      match_up_analysis()
 elif analysis_type == "Line & Length Dismissal Matrix":
     line_length_dismissal_matrix()
-    
+elif analysis_type == "MVP of PSL":
+    mvp_of_psl()
+
