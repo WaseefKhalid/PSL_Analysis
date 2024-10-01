@@ -9,31 +9,6 @@ import matplotlib.pyplot as plt
 
 
 
-
-
-st.set_page_config(page_title="PSL Analysis", page_icon="🏏", layout="wide")
-
-# Your application code goes below
-def add_bg_from_url():
-    st.markdown(
-        """
-        <style>
-        .stApp {
-            background-image: url("https://www.example.com/your-image-url.jpg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-# Add the background image
-add_bg_from_url()
-
-
 def download_and_unzip_data(url):
     response = requests.get(url)
     zip_file = BytesIO(response.content)
