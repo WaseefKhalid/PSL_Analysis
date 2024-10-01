@@ -1177,15 +1177,15 @@ if analysis_type == "Home":
     home_section()
 elif analysis_type == "Best Shots by Ground":
     effective_shots_on_different_grounds()
-elif analysis_type == "Bowling Line and Length Insights":
+elif analysis_type == "Bolwing Line & Length Insights":
     line_and_length()
-elif analysis_type == "Batsman Strengths and Weaknesses":
+elif analysis_type == "Batsman Strength & Weakness":
     batsman_swot()
-elif analysis_type == "Toss Impact on Match Results":
+elif analysis_type == "Toss Impact":
     toss_and_match_outcome_analysis()
-elif analysis_type == "Player Batting Profiles":
+elif analysis_type == "Batsman Profile":
     batsman_profile_analysis()
-elif analysis_type == "Player Bowling Profiles":
+elif analysis_type == "Bowler Profile":
     bowler_profile_analysis()
 elif analysis_type == "Match-UP Analysis":
      match_up_analysis()
