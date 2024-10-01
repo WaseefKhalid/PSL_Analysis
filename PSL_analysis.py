@@ -568,6 +568,8 @@ def toss_and_match_outcome_analysis():
 
         st.write('Bowling Analysis:', bowling_analysis)
 
+import matplotlib.pyplot as plt
+
 def batsman_profile_analysis():
     # CSS for blue background and yellow text
     st.markdown(
@@ -682,45 +684,63 @@ def batsman_profile_analysis():
             with col1:
                 # Plot Strike Rate
                 fig, ax = plt.subplots()
-                ax.bar(sr_phase_wise['Phase'], sr_phase_wise['SR'], color='skyblue')
+                bars = ax.bar(sr_phase_wise['Phase'], sr_phase_wise['SR'], color='skyblue')
                 ax.set_title('Strike Rate by Phase')
                 ax.set_ylabel('Strike Rate')
+                for bar in bars:
+                    yval = bar.get_height()
+                    ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), va='bottom')  # Add exact number on the bar
                 st.pyplot(fig)
 
                 # Plot Balls per Six
                 fig, ax = plt.subplots()
-                ax.bar(six_ratio_phase_wise['Phase'], six_ratio_phase_wise['Balls per Six'], color='green')
+                bars = ax.bar(six_ratio_phase_wise['Phase'], six_ratio_phase_wise['Balls per Six'], color='green')
                 ax.set_title('Balls per Six by Phase')
                 ax.set_ylabel('Balls per Six')
+                for bar in bars:
+                    yval = bar.get_height()
+                    ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), va='bottom')  # Add exact number on the bar
                 st.pyplot(fig)
 
                 # Plot Balls per Four
                 fig, ax = plt.subplots()
-                ax.bar(four_ratio_phase_wise['Phase'], four_ratio_phase_wise['Balls per Four'], color='purple')
+                bars = ax.bar(four_ratio_phase_wise['Phase'], four_ratio_phase_wise['Balls per Four'], color='purple')
                 ax.set_title('Balls per Four by Phase')
                 ax.set_ylabel('Balls per Four')
+                for bar in bars:
+                    yval = bar.get_height()
+                    ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), va='bottom')  # Add exact number on the bar
                 st.pyplot(fig)
 
             with col2:
                 # Plot Dot Ball Percentage
                 fig, ax = plt.subplots()
-                ax.bar(dot_ball_phase_wise['Phase'], dot_ball_phase_wise['Dot Ball %'], color='red')
+                bars = ax.bar(dot_ball_phase_wise['Phase'], dot_ball_phase_wise['Dot Ball %'], color='red')
                 ax.set_title('Dot Ball Percentage by Phase')
                 ax.set_ylabel('Dot Ball %')
+                for bar in bars:
+                    yval = bar.get_height()
+                    ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), va='bottom')  # Add exact number on the bar
                 st.pyplot(fig)
 
                 # Plot Percentage of Activity Runs
                 fig, ax = plt.subplots()
-                ax.bar(activity_runs_phase_wise['Phase'], activity_runs_phase_wise['Activity Runs %'], color='orange')
+                bars = ax.bar(activity_runs_phase_wise['Phase'], activity_runs_phase_wise['Activity Runs %'], color='orange')
                 ax.set_title('Percentage of Activity Runs by Phase')
                 ax.set_ylabel('Activity Runs %')
+                for bar in bars:
+                    yval = bar.get_height()
+                    ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), va='bottom')  # Add exact number on the bar
                 st.pyplot(fig)
 
                 # Plot Control Percentage
                 fig, ax = plt.subplots()
-                ax.bar(control_phase_wise['Phase'], control_phase_wise['Control %'], color='blue')
+                bars = ax.bar(control_phase_wise['Phase'], control_phase_wise['Control %'], color='blue')
                 ax.set_title('Control Percentage by Phase')
                 ax.set_ylabel('Control %')
+                for bar in bars:
+                    yval = bar.get_height()
+                    ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), va='bottom')  # Add exact number on the bar
                 st.pyplot(fig)
 
         # Call the player profile function
@@ -846,9 +866,6 @@ def bowler_profile_analysis():
         bowler_profile()
 
 
-
-
-import matplotlib.pyplot as plt
 
 def match_up_analysis():
     st.markdown(
