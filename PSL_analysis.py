@@ -1084,6 +1084,8 @@ def line_length_dismissal_matrix():
                 # Show the plot
                 st.pyplot(plt)
 
+
+
 def mvp_of_psl():
     st.markdown(
         """
@@ -1115,65 +1117,80 @@ def mvp_of_psl():
     else:
         df_filtered = df
 
-    # Top N for Economy Rate (Bowler) with Minimum Balls Filter and Phase-Wise Filter
-    st.subheader("Top N Players with Lowest Economy Rate (Bowler)")
-    min_balls_bowled = st.number_input('Minimum Balls Bowled', min_value=1, value=30, key='min_balls_bowled')
-    
-    # Optional Phase Filter for Economy Rate
-    activate_phase_filter_eco = st.checkbox('Activate Phase Filter for Economy Rate', key='eco_phase_filter_active')
-    if activate_phase_filter_eco:
-        selected_phase_eco = st.selectbox("Select Phase", ['Powerplay', 'Middle', 'Death'], key='eco_phase')
-        df_filtered = df_filtered[df_filtered['Phase'] == selected_phase_eco]
+    # Phase Filter Function
+    def phase_filter(df, key):
+        phase_activated = st.checkbox(f'Activate Phase Filter for {key}', key=f'{key}_phase_filter_active')
+        if phase_activated:
+            selected_phase = st.selectbox(f'Select Phase for {key}', ['Powerplay', 'Middle', 'Death'], key=f'{key}_phase')
+            return df[df['Phase'] == selected_phase]
+        return df
 
+    ### Economy Rate (Bowler) ###
+    st.subheader("Top N Players with Lowest Economy Rate (Bowler)")
+    df_eco = phase_filter(df_filtered, 'Economy Rate')  # Apply Phase Filter
+
+    min_balls_bowled = st.number_input('Minimum Balls Bowled', min_value=1, value=30, key='min_balls_bowled')
     top_n_eco = st.slider('Select Top N for Economy Rate', min_value=1, max_value=20, value=5, key='eco_rate_n')
-    
-    top_eco_df = df_filtered.groupby('bowl').agg({'bowlruns': 'sum', 'ball': 'count'}).reset_index()
+
+    top_eco_df = df_eco.groupby('bowl').agg({'bowlruns': 'sum', 'ball': 'count'}).reset_index()
     top_eco_df = top_eco_df[top_eco_df['ball'] >= min_balls_bowled]
     top_eco_df['economy_rate'] = top_eco_df['bowlruns'] / (top_eco_df['ball'] / 6)
     top_eco_df = top_eco_df[['bowl', 'economy_rate']].nsmallest(top_n_eco, 'economy_rate')
-    st.write(top_eco_df)
-
-    # Top N for Batting Strike Rate (Batsman) with Phase-Wise Filter
-    st.subheader("Top N Players with Highest Batting Strike Rate (Batsman)")
     
-    # Optional Phase Filter for Strike Rate
-    activate_phase_filter_sr = st.checkbox('Activate Phase Filter for Batting Strike Rate', key='sr_phase_filter_active')
-    if activate_phase_filter_sr:
-        selected_phase_sr = st.selectbox("Select Phase", ['Powerplay', 'Middle', 'Death'], key='sr_phase')
-        df_filtered = df_filtered[df_filtered['Phase'] == selected_phase_sr]
+    # Present the result in a table
+    st.table(top_eco_df)
+
+    ### Batting Strike Rate (Batsman) ###
+    st.subheader("Top N Players with Highest Batting Strike Rate (Batsman)")
+    df_sr = phase_filter(df_filtered, 'Batting Strike Rate')  # Apply Phase Filter
 
     top_n_sr = st.slider('Select Top N for Batting Strike Rate', min_value=1, max_value=20, value=5, key='sr_n')
     
-    top_sr_df = df_filtered.groupby('bat').agg({'batruns': 'sum', 'ball': 'count'}).reset_index()
+    top_sr_df = df_sr.groupby('bat').agg({'batruns': 'sum', 'ball': 'count'}).reset_index()
     top_sr_df['strike_rate'] = (top_sr_df['batruns'] / top_sr_df['ball']) * 100
     top_sr_df = top_sr_df[['bat', 'strike_rate']].nlargest(top_n_sr, 'strike_rate')
-    st.write(top_sr_df)
 
-    # Top N for Most Dot Balls (Bowler) with Year Filter
+    # Present the result in a table
+    st.table(top_sr_df)
+
+    ### Most Dot Balls (Bowler) ###
     st.subheader("Top N Players with Most Dot Balls (Bowler)")
+    df_dot = phase_filter(df_filtered, 'Dot Balls')  # Apply Phase Filter
+
     top_n_dot = st.slider('Select Top N for Dot Balls', min_value=1, max_value=20, value=5, key='dot_balls_n')
     
-    top_dot_df = df_filtered.groupby('bowl').agg({'isDot': 'sum'}).reset_index()
+    top_dot_df = df_dot.groupby('bowl').agg({'isDot': 'sum'}).reset_index()
     top_dot_df = top_dot_df[['bowl', 'isDot']].nlargest(top_n_dot, 'isDot')
-    st.write(top_dot_df)
 
-    # Top N for Balls per Six (Batsman) with Year Filter
+    # Present the result in a table
+    st.table(top_dot_df)
+
+    ### Balls per Six (Batsman) ###
     st.subheader("Top N Players with Balls per Six (Batsman)")
+    df_six = phase_filter(df_filtered, 'Balls per Six')  # Apply Phase Filter
+
     top_n_six = st.slider('Select Top N for Balls per Six', min_value=1, max_value=20, value=5, key='six_n')
     
-    top_six_df = df_filtered.groupby('bat').agg({'isSix': 'sum', 'ball': 'count'}).reset_index()
+    top_six_df = df_six.groupby('bat').agg({'isSix': 'sum', 'ball': 'count'}).reset_index()
     top_six_df['balls_per_six'] = top_six_df.apply(lambda x: round(x['ball'] / x['isSix'], 2) if x['isSix'] > 0 else float('inf'), axis=1)
     top_six_df = top_six_df[['bat', 'balls_per_six']].nsmallest(top_n_six, 'balls_per_six')
-    st.write(top_six_df)
 
-    # Top N for Balls per Four (Batsman) with Year Filter
+    # Present the result in a table
+    st.table(top_six_df)
+
+    ### Balls per Four (Batsman) ###
     st.subheader("Top N Players with Balls per Four (Batsman)")
+    df_four = phase_filter(df_filtered, 'Balls per Four')  # Apply Phase Filter
+
     top_n_four = st.slider('Select Top N for Balls per Four', min_value=1, max_value=20, value=5, key='four_n')
     
-    top_four_df = df_filtered.groupby('bat').agg({'isFour': 'sum', 'ball': 'count'}).reset_index()
+    top_four_df = df_four.groupby('bat').agg({'isFour': 'sum', 'ball': 'count'}).reset_index()
     top_four_df['balls_per_four'] = top_four_df.apply(lambda x: round(x['ball'] / x['isFour'], 2) if x['isFour'] > 0 else float('inf'), axis=1)
     top_four_df = top_four_df[['bat', 'balls_per_four']].nsmallest(top_n_four, 'balls_per_four')
-    st.write(top_four_df)
+
+    # Present the result in a table
+    st.table(top_four_df)
+
 
 
 
