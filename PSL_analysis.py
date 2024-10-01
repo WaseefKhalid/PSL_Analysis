@@ -83,14 +83,14 @@ def home_section():
         Use the sidebar to navigate between different analyses such as:
         </p>
         <ul>
-            <li>Best Shots by Ground</li>
-            <li>Batsman Strengths and Weaknesses</li>
-            <li>Toss Impact on Match Results</li>
-            <li>Toss and Match Outcome Analysis</li>
-            <li>Player Batting Profiles</li>
-            <li>Player Bowling Profile</li>
-            <li>Match-UP Analysis </li>
-            <li>Line & Length Dissmissal Matrix </li>
+            <li>Batsman Profile</li>
+            <li>Bowler Profile</li>
+            <li>Match-UP Analysis</li>
+            <li>Line & Length Dismissal Matrix</li>
+            <li>Batsman Strength & Weakness</li>
+            <li>Bolwing Line & Length Insights</li>
+            <li>Best Shots By Ground </li>
+            <li>Toss Impacp </li>
         </ul>
         <p>Select any section from the sidebar to get started!</p>
         </div>
@@ -1162,14 +1162,14 @@ st.markdown(
 # Sidebar with radio buttons for selecting the analysis type
 analysis_type = st.sidebar.radio("Choose the analysis", [
     "Home",
-    "Best Shots by Ground",
-    "Bowling Line and Length Insights",
-    "Batsman Strengths and Weaknesses",
-    "Toss Impact on Match Results",
-    "Player Batting Profiles",
-    "Player Bowling Profiles",
+    "Batsman Profile",
+    "Bowler Profile",
     "Match-UP Analysis",
-    "Line & Length Dismissal Matrix"
+    "Line & Length Dismissal Matrix",
+    "Batsman Strength & Weakness",
+    "Bolwing Line & Length Insights",
+    "Best Shots By Ground",
+    "Toss Impact"
 ])
 
 # Display the selected analysis section
