@@ -1149,7 +1149,7 @@ analysis_type = st.sidebar.radio("Choose the analysis", [
     "Player Batting Profiles",
     "Player Bowling Profiles",
     "Match-UP Analysis",
-    "line & Length Dismissal Matrix"
+    "Line & Length Dismissal Matrix"
 ])
 
 # Display the selected analysis section
@@ -1169,6 +1169,6 @@ elif analysis_type == "Player Bowling Profiles":
     bowler_profile_analysis()
 elif analysis_type == "Match-UP Analysis":
      match_up_analysis()
-elif analysis_type == "line & Length Dismissal Matrix":
+elif analysis_type == "Line & Length Dismissal Matrix":
     line_length_dismissal_matrix()
     
