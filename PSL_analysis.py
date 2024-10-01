@@ -824,6 +824,8 @@ def bowler_profile_analysis():
 
 
 
+import matplotlib.pyplot as plt
+
 def match_up_analysis():
     st.markdown(
         """
@@ -896,7 +898,7 @@ def match_up_analysis():
                     'Economy Rate': economy_rate
                 }
 
-                # Plot key stats as a bar chart
+                # Plot key stats as a bar chart using matplotlib
                 fig, ax = plt.subplots()
                 ax.barh(list(match_up_stats.keys()), list(match_up_stats.values()), color='skyblue')
                 ax.set_xlabel('Value')
@@ -938,13 +940,15 @@ def match_up_analysis():
                 phase_wise_data['Phase'] = pd.Categorical(phase_wise_data['Phase'], categories=phase_order, ordered=True)
                 phase_wise_data = phase_wise_data.sort_values('Phase')
 
-                # Visualize phase-wise data using a heatmap
-                st.subheader('Phase-Wise Heatmap')
-
+                # Plot phase-wise data using matplotlib
                 fig, ax = plt.subplots(figsize=(8, 4))
-                sns.heatmap(phase_wise_data.set_index('Phase').T, annot=True, fmt='.2f', cmap='coolwarm', linewidths=0.5, ax=ax)
+                ax.imshow(phase_wise_data.set_index('Phase').T, cmap='coolwarm', aspect='auto')
+                ax.set_xticks(range(len(phase_order)))
+                ax.set_xticklabels(phase_order)
+                ax.set_yticks(range(phase_wise_data.shape[1] - 1))
                 ax.set_title(f'{batsman_name.title()} vs {bowler_name.title()} Phase-Wise Analysis')
                 st.pyplot(fig)
+
 
 
 # CSS for sidebar radio buttons
