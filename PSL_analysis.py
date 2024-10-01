@@ -823,6 +823,7 @@ def bowler_profile_analysis():
 
 
 
+
 import matplotlib.pyplot as plt
 
 def match_up_analysis():
@@ -899,9 +900,15 @@ def match_up_analysis():
 
                 # Plot key stats as a bar chart using matplotlib
                 fig, ax = plt.subplots()
-                ax.barh(list(match_up_stats.keys()), list(match_up_stats.values()), color='skyblue')
+                bars = ax.barh(list(match_up_stats.keys()), list(match_up_stats.values()), color='skyblue')
                 ax.set_xlabel('Value')
                 ax.set_title(f'{batsman_name.title()} vs {bowler_name.title()} Key Stats')
+
+                # Add exact numbers on the bars
+                for bar in bars:
+                    width = bar.get_width()
+                    ax.text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}', va='center')
+
                 st.pyplot(fig)
 
                 # Phase-Wise Analysis
@@ -939,15 +946,8 @@ def match_up_analysis():
                 phase_wise_data['Phase'] = pd.Categorical(phase_wise_data['Phase'], categories=phase_order, ordered=True)
                 phase_wise_data = phase_wise_data.sort_values('Phase')
 
-                # Plot phase-wise data using matplotlib
-                fig, ax = plt.subplots(figsize=(8, 4))
-                ax.imshow(phase_wise_data.set_index('Phase').T, cmap='coolwarm', aspect='auto')
-                ax.set_xticks(range(len(phase_order)))
-                ax.set_xticklabels(phase_order)
-                ax.set_yticks(range(phase_wise_data.shape[1] - 1))
-                ax.set_title(f'{batsman_name.title()} vs {bowler_name.title()} Phase-Wise Analysis')
-                st.pyplot(fig)
-
+                # Display the phase-wise data as a table
+                st.table(phase_wise_data)
 
 
 # CSS for sidebar radio buttons
