@@ -90,7 +90,7 @@ def home_section():
             <li>Batsman Strength & Weakness</li>
             <li>Bolwing Line & Length Insights</li>
             <li>Best Shots By Ground </li>
-            <li>Toss Impacp </li>
+            <li>Toss Impact </li>
         </ul>
         <p>Select any section from the sidebar to get started!</p>
         </div>
