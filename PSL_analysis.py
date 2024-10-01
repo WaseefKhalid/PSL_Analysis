@@ -91,6 +91,7 @@ def home_section():
             <li>Toss and Match Outcome Analysis</li>
             <li>Player Batting Profiles</li>
             <li>Player Bowling Profile</li>
+            <li>Match-UP Analysis </li>
         </ul>
         <p>Select any section from the sidebar to get started!</p>
         </div>
@@ -822,6 +823,110 @@ def bowler_profile_analysis():
 
         bowler_profile()
 
+def match_up_analysis():
+    st.markdown(
+        """
+        <style>
+        .blue-bg-yellow-text {
+            background-color: #007BFF; /* Blue background */
+            color: #FFD700; /* Yellow text */
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .blue-bg-yellow-text h1 {
+            color: #FFD700 !important; /* Force yellow text */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Title with blue background and yellow text
+    st.markdown('<div class="blue-bg-yellow-text"><h1>Bowler vs Batsman Match-Up Analysis</h1></div>', unsafe_allow_html=True)
+
+    # Select bowler
+    bowler_name = st.selectbox("Select Bowler", options=sorted(df['bowl'].str.title().unique()))
+
+    if bowler_name:
+        # Convert to lowercase for consistent filtering
+        bowler_name = bowler_name.lower()
+
+        # Select batsman
+        batsman_name = st.selectbox("Select Batsman", options=sorted(df['bat'].str.title().unique()))
+
+        if batsman_name:
+            # Convert to lowercase for consistent filtering
+            batsman_name = batsman_name.lower()
+
+            # Filter the dataset based on selected bowler and batsman
+            match_up_df = df[(df['bowl'] == bowler_name) & (df['bat'] == batsman_name)]
+
+            if match_up_df.empty:
+                st.error(f"No data available for the match-up between {batsman_name.title()} and {bowler_name.title()}.")
+            else:
+                # Calculate key statistics
+                total_balls = match_up_df['ball'].count()
+                total_runs = match_up_df['batruns'].sum()
+                total_fours = match_up_df['isFour'].sum()
+                total_sixes = match_up_df['isSix'].sum()
+                total_wickets = match_up_df['out'].sum()
+
+                # Calculate strike rate
+                if total_balls > 0:
+                    strike_rate = round((total_runs / total_balls) * 100, 2)
+                else:
+                    strike_rate = 0
+
+                # Calculate economy rate for the bowler
+                economy_rate = round(total_runs / (total_balls / 6), 2) if total_balls > 0 else 0
+
+                # Display the match-up stats
+                st.subheader(f"Match-Up: {batsman_name.title()} vs {bowler_name.title()}")
+                match_up_stats = {
+                    'Total Balls Faced': total_balls,
+                    'Total Runs Scored': total_runs,
+                    'Total Fours': total_fours,
+                    'Total Sixes': total_sixes,
+                    'Total Wickets Taken': total_wickets,
+                    'Strike Rate': strike_rate,
+                    'Economy Rate': economy_rate
+                }
+
+                st.table(pd.DataFrame(match_up_stats.items(), columns=["Stat", "Value"]))
+
+                # Add a detailed phase-wise analysis
+                st.subheader("Phase-Wise Analysis")
+
+                # Define the phases
+                def determine_phase(ball_id):
+                    if ball_id <= 6:
+                        return 'Powerplay'
+                    elif ball_id <= 15:
+                        return 'Middle'
+                    else:
+                        return 'Death'
+
+                match_up_df['Phase'] = match_up_df['ball_id'].apply(determine_phase)
+
+                # Calculate phase-wise metrics
+                runs_phase_wise = match_up_df.groupby('Phase')['batruns'].sum().reset_index()
+                balls_phase_wise = match_up_df.groupby('Phase')['ball'].count().reset_index()
+                wickets_phase_wise = match_up_df.groupby('Phase')['out'].sum().reset_index()
+
+                # Merge the phase-wise data
+                phase_wise_data = pd.merge(runs_phase_wise, balls_phase_wise, on='Phase')
+                phase_wise_data = pd.merge(phase_wise_data, wickets_phase_wise, on='Phase')
+
+                # Calculate strike rate and economy rate phase-wise
+                phase_wise_data['Strike Rate'] = (phase_wise_data['batruns'] / phase_wise_data['ball']) * 100
+                phase_wise_data['Economy Rate'] = (phase_wise_data['batruns'] / (phase_wise_data['ball'] / 6))
+
+                # Rename the columns for clarity
+                phase_wise_data.columns = ['Phase', 'Runs', 'Balls Faced', 'Wickets Taken', 'Strike Rate', 'Economy Rate']
+
+                st.table(phase_wise_data)
+
 
 
 
@@ -885,7 +990,8 @@ analysis_type = st.sidebar.radio("Choose the analysis", [
     "Batsman Strengths and Weaknesses",
     "Toss Impact on Match Results",
     "Player Batting Profiles",
-    "Player Bowling Profiles"
+    "Player Bowling Profiles",
+    "Match-UP Analysis"
 ])
 
 # Display the selected analysis section
@@ -903,3 +1009,5 @@ elif analysis_type == "Player Batting Profiles":
     batsman_profile_analysis()
 elif analysis_type == "Player Bowling Profiles":
     bowler_profile_analysis()
+elif analysis_type == "Match-UP Analysis":
+     match_up_analysis():
