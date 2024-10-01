@@ -823,6 +823,9 @@ def bowler_profile_analysis():
 
         bowler_profile()
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 def match_up_analysis():
     st.markdown(
         """
@@ -863,10 +866,6 @@ def match_up_analysis():
             match_up_df = df[(df['bowl'].str.lower().str.strip() == bowler_name_cleaned) &
                              (df['bat'].str.lower().str.strip() == batsman_name_cleaned)]
 
-            # Debugging: display the first few rows of the filtered dataset
-            st.write("Filtered Dataset Preview (First 5 rows):")
-            st.write(match_up_df.head())  # Show first 5 rows to check if the data is filtered correctly
-
             if match_up_df.empty:
                 st.error(f"No data available for the match-up between {batsman_name.title()} and {bowler_name.title()}.")
             else:
@@ -886,8 +885,9 @@ def match_up_analysis():
                 # Calculate economy rate for the bowler
                 economy_rate = round(total_runs / (total_balls / 6), 2) if total_balls > 0 else 0
 
-                # Display the match-up stats
+                # Remove the first table and visualize key statistics using a bar chart
                 st.subheader(f"Match-Up: {batsman_name.title()} vs {bowler_name.title()}")
+
                 match_up_stats = {
                     'Total Balls Faced': total_balls,
                     'Total Runs Scored': total_runs,
@@ -898,9 +898,14 @@ def match_up_analysis():
                     'Economy Rate': economy_rate
                 }
 
-                st.table(pd.DataFrame(match_up_stats.items(), columns=["Stat", "Value"]))
+                # Plot key stats as a bar chart
+                fig, ax = plt.subplots()
+                ax.barh(list(match_up_stats.keys()), list(match_up_stats.values()), color='skyblue')
+                ax.set_xlabel('Value')
+                ax.set_title(f'{batsman_name.title()} vs {bowler_name.title()} Key Stats')
+                st.pyplot(fig)
 
-                # Add a detailed phase-wise analysis
+                # Phase-Wise Analysis
                 st.subheader("Phase-Wise Analysis")
 
                 # Define the phases
@@ -930,7 +935,13 @@ def match_up_analysis():
                 # Rename the columns for clarity
                 phase_wise_data.columns = ['Phase', 'Runs', 'Balls Faced', 'Wickets Taken', 'Strike Rate', 'Economy Rate']
 
-                st.table(phase_wise_data)
+                # Visualize phase-wise data using a heatmap
+                st.subheader('Phase-Wise Heatmap')
+
+                fig, ax = plt.subplots(figsize=(8, 4))
+                sns.heatmap(phase_wise_data.set_index('Phase').T, annot=True, fmt='.2f', cmap='coolwarm', linewidths=0.5, ax=ax)
+                ax.set_title(f'{batsman_name.title()} vs {bowler_name.title()} Phase-Wise Analysis')
+                st.pyplot(fig)
 
 
 # CSS for sidebar radio buttons
