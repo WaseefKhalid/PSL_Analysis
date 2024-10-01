@@ -8,12 +8,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+
+# Set page config at the start of the app
+st.set_page_config(page_title="PSL Analysis", page_icon=":bar_chart:", layout="wide")
+
+# Add the rest of your app code below
 def add_bg_from_url():
     st.markdown(
         """
         <style>
         .stApp {
-            background-image: url("https://stock.adobe.com/images/sport-stadium-at-night-as-wide-backdrop-digital-3d-illustration-for-background-advertisement/369503958");
+            background-image: url("https://www.example.com/your-image-url.jpg");
             background-size: cover;
         }
         </style>
@@ -23,7 +28,7 @@ def add_bg_from_url():
 
 add_bg_from_url()
 
-# Your Streamlit content goes here
+# Continue with your Streamlit content
 st.title("This is a Streamlit app with a background image!")
 
 
