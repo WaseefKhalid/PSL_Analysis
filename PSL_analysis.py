@@ -90,6 +90,7 @@ def home_section():
             <li>Player Batting Profiles</li>
             <li>Player Bowling Profile</li>
             <li>Match-UP Analysis </li>
+            <li>Line & Length Dissmissal Matrix </li>
         </ul>
         <p>Select any section from the sidebar to get started!</p>
         </div>
@@ -1007,6 +1008,85 @@ def match_up_analysis():
                 st.table(phase_wise_data)
 
 
+
+def line_length_dismissal_matrix():
+    st.markdown(
+        """
+        <style>
+        .blue-bg-yellow-text {
+            background-color: #007BFF; /* Blue background */
+            color: #FFD700; /* Yellow text */
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .blue-bg-yellow-text h1 {
+            color: #FFD700 !important; /* Force yellow text */
+            font-size: 2.5em; /* Make the font size larger */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Title with blue background and yellow text
+    st.markdown('<div class="blue-bg-yellow-text"><h1>Bowler\'s Line-Length Dismissal Matrix</h1></div>', unsafe_allow_html=True)
+
+    # Select bowler
+    bowler_name = st.selectbox("Select Bowler", options=sorted(df['bowl'].str.title().unique()))
+
+    if bowler_name:
+        # Convert to lowercase and strip spaces for consistent filtering
+        bowler_name_cleaned = bowler_name.lower().strip()
+
+        # Select batsman
+        batsman_name = st.selectbox("Select Batsman", options=sorted(df['bat'].str.title().unique()))
+
+        if batsman_name:
+            # Convert to lowercase and strip spaces for consistent filtering
+            batsman_name_cleaned = batsman_name.lower().strip()
+
+            # Filter the dataset for the selected bowler and batsman
+            match_up_df = df[(df['bowl'].str.lower().str.strip() == bowler_name_cleaned) &
+                             (df['bat'].str.lower().str.strip() == batsman_name_cleaned)]
+
+            if match_up_df.empty:
+                st.error(f"No data available for the match-up between {batsman_name.title()} and {bowler_name.title()}.")
+            else:
+                # Group the data by line and length, then sum up dismissals (outs)
+                line_length_dismissal_data = match_up_df.groupby(['line', 'length']).agg({'out': 'sum'}).reset_index()
+
+                # Create a scatter plot
+                plt.figure(figsize=(10, 6))
+                scatter = plt.scatter(
+                    line_length_dismissal_data['line'],
+                    line_length_dismissal_data['length'],
+                    s=line_length_dismissal_data['out'] * 100,  # Adjust the size based on the number of dismissals
+                    c=line_length_dismissal_data['out'],
+                    cmap='coolwarm', alpha=0.7, edgecolors='w'
+                )
+                
+                # Add labels and title
+                plt.title(f'Dismissals by Line and Length: {bowler_name.title()} vs {batsman_name.title()}', fontsize=16)
+                plt.xlabel('Line', fontsize=12)
+                plt.ylabel('Length', fontsize=12)
+
+                # Add color bar to show dismissal intensity
+                plt.colorbar(scatter, label='Number of Dismissals')
+
+                # Annotate the scatter points with dismissal numbers
+                for i, txt in enumerate(line_length_dismissal_data['out']):
+                    plt.annotate(txt, (line_length_dismissal_data['line'][i], line_length_dismissal_data['length'][i]),
+                                 textcoords="offset points", xytext=(0, 5), ha='center')
+
+                # Show the plot
+                st.pyplot(plt)
+
+
+
+
+
 # CSS for sidebar radio buttons
 st.markdown(
     """
@@ -1068,7 +1148,8 @@ analysis_type = st.sidebar.radio("Choose the analysis", [
     "Toss Impact on Match Results",
     "Player Batting Profiles",
     "Player Bowling Profiles",
-    "Match-UP Analysis"
+    "Match-UP Analysis",
+    "line & Length Dismissal Matrix":
 ])
 
 # Display the selected analysis section
@@ -1088,3 +1169,6 @@ elif analysis_type == "Player Bowling Profiles":
     bowler_profile_analysis()
 elif analysis_type == "Match-UP Analysis":
      match_up_analysis()
+elif analysis_type == "line & Length Dismissal Matrix":
+    line_length_dismissal_matrix()
+    
