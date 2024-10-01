@@ -565,6 +565,13 @@ def batsman_profile_analysis():
     phase_order = ['Powerplay', 'Middle', 'Death']
     filtered_df['Phase'] = pd.Categorical(filtered_df['Phase'], categories=phase_order, ordered=True)
 
+    # Add a multiselect filter for years
+    selected_years = st.multiselect("Select Year(s)", options=sorted(filtered_df['year'].unique()))
+    
+    # Filter based on selected years
+    if selected_years:
+        filtered_df = filtered_df[filtered_df['year'].isin(selected_years)]
+
     # Use only a select box to select batsman
     batsman_name = st.selectbox("Select Batsman", options=sorted(filtered_df['bat'].str.title().unique()))
 
@@ -651,7 +658,6 @@ def batsman_profile_analysis():
 
         # Call the player profile function
         player_profile(batsman_name)
-
 
 
 
