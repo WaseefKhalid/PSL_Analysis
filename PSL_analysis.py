@@ -823,11 +823,7 @@ def bowler_profile_analysis():
 
         bowler_profile()
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 def match_up_analysis():
     st.markdown(
