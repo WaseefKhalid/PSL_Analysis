@@ -826,6 +826,9 @@ def bowler_profile_analysis():
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 def match_up_analysis():
     st.markdown(
         """
@@ -934,6 +937,11 @@ def match_up_analysis():
 
                 # Rename the columns for clarity
                 phase_wise_data.columns = ['Phase', 'Runs', 'Balls Faced', 'Wickets Taken', 'Strike Rate', 'Economy Rate']
+
+                # Reorder phases (Powerplay, Middle, Death)
+                phase_order = ['Powerplay', 'Middle', 'Death']
+                phase_wise_data['Phase'] = pd.Categorical(phase_wise_data['Phase'], categories=phase_order, ordered=True)
+                phase_wise_data = phase_wise_data.sort_values('Phase')
 
                 # Visualize phase-wise data using a heatmap
                 st.subheader('Phase-Wise Heatmap')
