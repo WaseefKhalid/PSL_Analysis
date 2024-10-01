@@ -11,6 +11,24 @@ import matplotlib.pyplot as plt
 
 
 
+def add_bg_from_url():
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background-image: url("https://www.google.com/url?sa=i&url=https%3A%2F%2Fstock.adobe.com%2Fsearch%3Fk%3Dcricket%2Bgame%2Bbackground&psig=AOvVaw3b-sROWpc_uVnwIESz62Aj&ust=1727892700486000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCJihn4nk7YgDFQAAAAAdAAAAABAE");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Call the function at the beginning of your app to add the background
+add_bg_from_url()
 
 
 def download_and_unzip_data(url):
