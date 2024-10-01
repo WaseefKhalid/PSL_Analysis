@@ -120,7 +120,7 @@ def effective_shots_on_different_grounds():
     )
 
     # Title with blue background and yellow text
-    st.markdown('<div class="blue-bg-yellow-text"><h1>Best Shots by Ground</h1></div>', unsafe_allow_html=True)
+    st.markdown('<div class="blue-bg-yellow-text"><h1>Scoring Pattern on This Ground</h1></div>', unsafe_allow_html=True)
 
     # Selectbox for ground selection
     selected_ground_shot = st.selectbox("Select Ground for Shot Analysis", df['ground'].unique(), key='ground_shot_select_1')
@@ -160,44 +160,47 @@ def effective_shots_on_different_grounds():
     if filtered_df_shot.empty:
         st.error("No data available for the selected filters.")
     else:
-        avg_runs_per_shot = filtered_df_shot.groupby('shot')['batruns'].mean().reset_index()
-        avg_runs_per_shot = avg_runs_per_shot.sort_values(by='batruns', ascending=False)
+        # Total runs and number of deliveries in the filtered data
+        total_runs = filtered_df_shot['batruns'].sum()
+        total_balls = filtered_df_shot['ball'].count()
 
-        dismissal_rate_per_shot = filtered_df_shot.groupby('shot')['out'].mean().reset_index()
-        dismissal_rate_per_shot['out'] = dismissal_rate_per_shot['out'] * 100
+        # Boundary runs (where 'IsBoundary' == 1)
+        boundary_runs = filtered_df_shot[filtered_df_shot['IsBoundary'] == 1]['batruns'].sum()
+        boundary_balls = filtered_df_shot[filtered_df_shot['IsBoundary'] == 1]['ball'].count()
 
-        shot_analysis = pd.merge(avg_runs_per_shot, dismissal_rate_per_shot, on='shot')
-        shot_analysis.columns = ['shot', 'avg_runs', 'dismissal_rate']
+        # Non-boundary (activity) runs
+        non_boundary_runs = total_runs - boundary_runs
+        non_boundary_balls = total_balls - boundary_balls
 
-        shot_analysis = shot_analysis.sort_values(by='avg_runs', ascending=False)
+        # Calculate percentages
+        boundary_percentage = (boundary_runs / total_runs) * 100 if total_runs > 0 else 0
+        non_boundary_percentage = (non_boundary_runs / total_runs) * 100 if total_runs > 0 else 0
 
-        # Plot Average Runs per Shot Type as Horizontal Bar Chart
-        st.subheader('Average Runs per Shot Type')
+        # Display the summary
+        st.subheader('Scoring Pattern on This Ground')
+
+        summary_data = {
+            'Run Type': ['Boundary Shots', 'Non-Boundary Shots'],
+            'Total Runs': [boundary_runs, non_boundary_runs],
+            'Percentage of Total Runs (%)': [boundary_percentage, non_boundary_percentage]
+        }
+
+        summary_df = pd.DataFrame(summary_data)
+
+        st.write(summary_df)
+
+        # Plot the scoring pattern as a pie chart
+        st.subheader('Scoring Pattern - Pie Chart')
         fig, ax = plt.subplots()
-        bars = ax.barh(shot_analysis['shot'], shot_analysis['avg_runs'], color='skyblue')
+        labels = ['Boundary Shots', 'Non-Boundary Shots']
+        sizes = [boundary_percentage, non_boundary_percentage]
+        colors = ['#FFD700', '#007BFF']
 
-        # Add exact values on top of the bars
-        for bar in bars:
-            width = bar.get_width()
-            ax.text(width, bar.get_y() + bar.get_height() / 2, 
-                    f'{width:.2f}',  # Format the value to 2 decimal places
-                    va='center', 
-                    ha='left', 
-                    color='black')
+        ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, counterclock=False)
+        ax.axis('equal')  # Equal aspect ratio ensures the pie is drawn as a circle.
 
-        ax.set_xlabel('Average Runs')
-        ax.set_ylabel('Shot Type')
-        ax.set_title('Average Runs per Shot Type')
         st.pyplot(fig)
 
-        # Plot Dismissal Rate per Shot Type as Horizontal Bar Chart
-        st.subheader('Dismissal Rate per Shot Type (Percentage)')
-        fig, ax = plt.subplots()
-        ax.barh(shot_analysis['shot'], shot_analysis['dismissal_rate'], color='salmon')
-        ax.set_xlabel('Dismissal Rate (%)')
-        ax.set_ylabel('Shot Type')
-        ax.set_title('Dismissal Rate per Shot Type')
-        st.pyplot(fig)
 
 
 
