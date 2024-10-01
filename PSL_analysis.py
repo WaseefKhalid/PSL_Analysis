@@ -243,8 +243,6 @@ def effective_shots_on_different_grounds():
 
 
 
-
-
 def line_and_length():
     st.markdown(
         """
