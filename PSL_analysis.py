@@ -1087,13 +1087,14 @@ def line_length_dismissal_matrix():
                     # Show the plot
                     st.pyplot(plt)
 
-                    # Show detailed dismissal description
+                    # Show detailed dismissal description where the dismissal count is greater than 0
                     st.markdown("### Dismissal Descriptions")
                     for idx, row in match_up_df.iterrows():
-                        line = row['line']
-                        length = row['length']
-                        dismissal = row['dismissal']
-                        st.markdown(f"- **{batsman_name.title()}** was dismissed by **{bowler_name.title()}** with a **{dismissal}** at line **{line}** and length **{length}**.")
+                        if row['out'] > 0:  # Only show description if dismissal count is greater than 0
+                            line = row['line']
+                            length = row['length']
+                            dismissal = row['dismissal']
+                            st.markdown(f"- **{batsman_name.title()}** was dismissed by **{bowler_name.title()}** with a **{dismissal}** at line **{line}** and length **{length}**.")
 
     elif analysis_type == 'Batsman Dismissals by Bowling Style':
         # Batsman dismissals based on bowling style
@@ -1142,13 +1143,15 @@ def line_length_dismissal_matrix():
                 # Show the plot
                 st.pyplot(plt)
 
-                # Show detailed dismissal description
+                # Show detailed dismissal description where the dismissal count is greater than 0
                 st.markdown("### Dismissal Descriptions")
                 for idx, row in match_up_df.iterrows():
-                    line = row['line']
-                    length = row['length']
-                    dismissal = row['dismissal']
-                    st.markdown(f"- **{batsman_name.title()}** was dismissed by a **{bowling_style}** bowler with a **{dismissal}** at line **{line}** and length **{length}**.")
+                    if row['out'] > 0:  # Only show description if dismissal count is greater than 0
+                        line = row['line']
+                        length = row['length']
+                        dismissal = row['dismissal']
+                        st.markdown(f"- **{batsman_name.title()}** was dismissed by a **{bowling_style}** bowler with a **{dismissal}** at line **{line}** and length **{length}**.")
+
 
 
 
