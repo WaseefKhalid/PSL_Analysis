@@ -567,6 +567,7 @@ def toss_and_match_outcome_analysis():
         bowling_analysis = bowling_analysis.drop(columns=['bowlruns', 'ball', 'out'])
 
         st.write('Bowling Analysis:', bowling_analysis)
+
 def batsman_profile_analysis():
     # CSS for blue background and yellow text
     st.markdown(
@@ -655,7 +656,6 @@ def batsman_profile_analysis():
             # Calculate metrics
             sr_phase_wise = player_df.groupby('Phase').apply(lambda x: (x['batruns'].sum() / x['ball'].count()) * 100).reset_index()
             sr_phase_wise.columns = ['Phase', 'SR']
-            sr_phase_wise['SR'] = sr_phase_wise['SR'].round(2)
 
             six_ratio_phase_wise = player_df.groupby('Phase').apply(lambda x: x['isSix'].sum() / x['ball'].count()).reset_index()
             six_ratio_phase_wise.columns = ['Phase', 'Six Ratio']
@@ -676,28 +676,52 @@ def batsman_profile_analysis():
 
             st.write(f"Player Profile: {batsman_name.title()}")
 
-            # Display the metrics side by side
+            # Display the metrics as graphs
             col1, col2 = st.columns(2)
 
             with col1:
-                st.write("### Strike Rate:")
-                st.table(sr_phase_wise)
+                # Plot Strike Rate
+                fig, ax = plt.subplots()
+                ax.bar(sr_phase_wise['Phase'], sr_phase_wise['SR'], color='skyblue')
+                ax.set_title('Strike Rate by Phase')
+                ax.set_ylabel('Strike Rate')
+                st.pyplot(fig)
 
-                st.write("### Balls per Six :")
-                st.table(six_ratio_phase_wise[['Phase', 'Balls per Six']])
+                # Plot Balls per Six
+                fig, ax = plt.subplots()
+                ax.bar(six_ratio_phase_wise['Phase'], six_ratio_phase_wise['Balls per Six'], color='green')
+                ax.set_title('Balls per Six by Phase')
+                ax.set_ylabel('Balls per Six')
+                st.pyplot(fig)
 
-                st.write("### Balls per Four:")
-                st.table(four_ratio_phase_wise[['Phase', 'Balls per Four']])
+                # Plot Balls per Four
+                fig, ax = plt.subplots()
+                ax.bar(four_ratio_phase_wise['Phase'], four_ratio_phase_wise['Balls per Four'], color='purple')
+                ax.set_title('Balls per Four by Phase')
+                ax.set_ylabel('Balls per Four')
+                st.pyplot(fig)
 
             with col2:
-                st.write("### Dot Ball Percentage:")
-                st.table(dot_ball_phase_wise)
+                # Plot Dot Ball Percentage
+                fig, ax = plt.subplots()
+                ax.bar(dot_ball_phase_wise['Phase'], dot_ball_phase_wise['Dot Ball %'], color='red')
+                ax.set_title('Dot Ball Percentage by Phase')
+                ax.set_ylabel('Dot Ball %')
+                st.pyplot(fig)
 
-                st.write("### Percentage of Activity Runs:")
-                st.table(activity_runs_phase_wise)
+                # Plot Percentage of Activity Runs
+                fig, ax = plt.subplots()
+                ax.bar(activity_runs_phase_wise['Phase'], activity_runs_phase_wise['Activity Runs %'], color='orange')
+                ax.set_title('Percentage of Activity Runs by Phase')
+                ax.set_ylabel('Activity Runs %')
+                st.pyplot(fig)
 
-                st.write("### Control Percentage:")
-                st.table(control_phase_wise)
+                # Plot Control Percentage
+                fig, ax = plt.subplots()
+                ax.bar(control_phase_wise['Phase'], control_phase_wise['Control %'], color='blue')
+                ax.set_title('Control Percentage by Phase')
+                ax.set_ylabel('Control %')
+                st.pyplot(fig)
 
         # Call the player profile function
         player_profile(batsman_name)
