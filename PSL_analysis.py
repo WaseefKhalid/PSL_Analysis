@@ -91,7 +91,6 @@ def home_section():
             <li>Player Bowling Profile</li>
             <li>Match-UP Analysis </li>
             <li>Line & Length Dissmissal Matrix </li>
-            <li>MVP of PSL </li>
         </ul>
         <p>Select any section from the sidebar to get started!</p>
         </div>
@@ -1106,123 +1105,6 @@ def plot_bar_chart(df, x_col, y_col, title, xlabel, ylabel):
         ax.text(i.get_width() + 0.2, i.get_y() + 0.5, str(round(i.get_width(), 2)), fontsize=12, color='black')
     st.pyplot(fig)
 
-def mvp_of_psl():
-    st.markdown(
-        """
-        <style>
-        .blue-bg-yellow-text {
-            background-color: #007BFF; /* Blue background */
-            color: #FFD700; /* Yellow text */
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .blue-bg-yellow-text h1 {
-            color: #FFD700 !important; /* Force yellow text */
-            font-size: 2.5em; /* Make the font size larger */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Title with blue background and yellow text
-    st.markdown('<div class="blue-bg-yellow-text"><h1>MVP of PSL</h1></div>', unsafe_allow_html=True)
-
-    # Optional year filter
-    selected_years = st.multiselect("Select Year(s)", options=sorted(df['year'].unique()), key='year_filter')
-
-    if selected_years:
-        df_filtered = df[df['year'].isin(selected_years)]
-    else:
-        df_filtered = df
-
-    # Add phase column based on overs (assuming 'over' is the column in your dataset)
-    if 'Phase' not in df_filtered.columns:
-        df_filtered['Phase'] = df_filtered['over'].apply(determine_phase)
-
-    # Phase Filter Function
-    def phase_filter(df, key):
-        phase_activated = st.checkbox(f'Activate Phase Filter for {key}', key=f'{key}_phase_filter_active')
-        if phase_activated:
-            selected_phase = st.selectbox(f'Select Phase for {key}', ['Powerplay', 'Middle', 'Death'], key=f'{key}_phase')
-            return df[df['Phase'] == selected_phase]
-        return df
-
-    ### Economy Rate (Bowler) ###
-    st.subheader("Top N Players with Lowest Economy Rate (Bowler)")
-    df_eco = phase_filter(df_filtered, 'Economy Rate')  # Apply Phase Filter
-
-    min_balls_bowled = st.number_input('Minimum Balls Bowled', min_value=1, value=30, key='min_balls_bowled')
-    top_n_eco = st.slider('Select Top N for Economy Rate', min_value=1, max_value=20, value=5, key='eco_rate_n')
-
-    top_eco_df = df_eco.groupby('bowl').agg({'bowlruns': 'sum', 'ball': 'count'}).reset_index()
-    top_eco_df = top_eco_df[top_eco_df['ball'] >= min_balls_bowled]
-    top_eco_df['economy_rate'] = top_eco_df['bowlruns'] / (top_eco_df['ball'] / 6)
-    top_eco_df = top_eco_df[['bowl', 'economy_rate']].nsmallest(top_n_eco, 'economy_rate')
-    
-    # Visualization for Economy Rate
-    plot_bar_chart(top_eco_df, 'bowl', 'economy_rate', 'Top N Players with Lowest Economy Rate', 'Economy Rate', 'Bowler')
-
-    ### Batting Strike Rate (Batsman) ###
-    st.subheader("Top N Players with Highest Batting Strike Rate (Batsman)")
-    df_sr = phase_filter(df_filtered, 'Batting Strike Rate')  # Apply Phase Filter
-
-    min_balls_faced_sr = st.number_input('Minimum Balls Faced for Batting Strike Rate', min_value=1, value=30, key='min_balls_faced_sr')
-    top_n_sr = st.slider('Select Top N for Batting Strike Rate', min_value=1, max_value=20, value=5, key='sr_n')
-    
-    top_sr_df = df_sr.groupby('bat').agg({'batruns': 'sum', 'ball': 'count'}).reset_index()
-    top_sr_df = top_sr_df[top_sr_df['ball'] >= min_balls_faced_sr]
-    top_sr_df['strike_rate'] = (top_sr_df['batruns'] / top_sr_df['ball']) * 100
-    top_sr_df = top_sr_df[['bat', 'strike_rate']].nlargest(top_n_sr, 'strike_rate')
-
-    # Visualization for Batting Strike Rate
-    plot_bar_chart(top_sr_df, 'bat', 'strike_rate', 'Top N Players with Highest Batting Strike Rate', 'Strike Rate', 'Batsman')
-
-    ### Most Dot Balls (Bowler) ###
-    st.subheader("Top N Players with Most Dot Balls (Bowler)")
-    df_dot = phase_filter(df_filtered, 'Dot Balls')  # Apply Phase Filter
-
-    min_balls_bowled_dot = st.number_input('Minimum Balls Bowled for Dot Balls', min_value=1, value=30, key='min_balls_bowled_dot')
-    top_n_dot = st.slider('Select Top N for Dot Balls', min_value=1, max_value=20, value=5, key='dot_balls_n')
-    
-    top_dot_df = df_dot.groupby('bowl').agg({'isDot': 'sum', 'ball': 'count'}).reset_index()
-    top_dot_df = top_dot_df[top_dot_df['ball'] >= min_balls_bowled_dot]
-    top_dot_df = top_dot_df[['bowl', 'isDot']].nlargest(top_n_dot, 'isDot')
-
-    # Visualization for Most Dot Balls
-    plot_bar_chart(top_dot_df, 'bowl', 'isDot', 'Top N Players with Most Dot Balls', 'Dot Balls', 'Bowler')
-
-    ### Balls per Six (Batsman) ###
-    st.subheader("Top N Players with Balls per Six (Batsman)")
-    df_six = phase_filter(df_filtered, 'Balls per Six')  # Apply Phase Filter
-
-    min_balls_faced_six = st.number_input('Minimum Balls Faced for Balls per Six', min_value=1, value=30, key='min_balls_faced_six')
-    top_n_six = st.slider('Select Top N for Balls per Six', min_value=1, max_value=20, value=5, key='six_n')
-    
-    top_six_df = df_six.groupby('bat').agg({'isSix': 'sum', 'ball': 'count'}).reset_index()
-    top_six_df = top_six_df[top_six_df['ball'] >= min_balls_faced_six]
-    top_six_df['balls_per_six'] = top_six_df.apply(lambda x: round(x['ball'] / x['isSix'], 2) if x['isSix'] > 0 else float('inf'), axis=1)
-    top_six_df = top_six_df[['bat', 'balls_per_six']].nsmallest(top_n_six, 'balls_per_six')
-
-    # Visualization for Balls per Six
-    plot_bar_chart(top_six_df, 'bat', 'balls_per_six', 'Top N Players with Balls per Six', 'Balls per Six', 'Batsman')
-
-    ### Balls per Four (Batsman) ###
-    st.subheader("Top N Players with Balls per Four (Batsman)")
-    df_four = phase_filter(df_filtered, 'Balls per Four')  # Apply Phase Filter
-
-    min_balls_faced_four = st.number_input('Minimum Balls Faced for Balls per Four', min_value=1, value=30, key='min_balls_faced_four')
-    top_n_four = st.slider('Select Top N for Balls per Four', min_value=1, max_value=20, value=5, key='four_n')
-    
-    top_four_df = df_four.groupby('bat').agg({'isFour': 'sum', 'ball': 'count'}).reset_index()
-    top_four_df = top_four_df[top_four_df['ball'] >= min_balls_faced_four]
-    top_four_df['balls_per_four'] = top_four_df.apply(lambda x: round(x['ball'] / x['isFour'], 2) if x['isFour'] > 0 else float('inf'), axis=1)
-    top_four_df = top_four_df[['bat', 'balls_per_four']].nsmallest(top_n_four, 'balls_per_four')
-
-    # Visualization for Balls per Four
-    plot_bar_chart(top_four_df, 'bat', 'balls_per_four', 'Top N Players with Balls per Four', 'Balls per Four', 'Batsman')
-
 
 
 # CSS for sidebar radio buttons
@@ -1287,8 +1169,7 @@ analysis_type = st.sidebar.radio("Choose the analysis", [
     "Player Batting Profiles",
     "Player Bowling Profiles",
     "Match-UP Analysis",
-    "Line & Length Dismissal Matrix",
-    "MVP of PSL"
+    "Line & Length Dismissal Matrix"
 ])
 
 # Display the selected analysis section
@@ -1310,6 +1191,5 @@ elif analysis_type == "Match-UP Analysis":
      match_up_analysis()
 elif analysis_type == "Line & Length Dismissal Matrix":
     line_length_dismissal_matrix()
-elif analysis_type == "MVP of PSL":
-    mvp_of_psl()
+
 
