@@ -568,7 +568,6 @@ def toss_and_match_outcome_analysis():
 
         st.write('Bowling Analysis:', bowling_analysis)
 
-import matplotlib.pyplot as plt
 
 def batsman_profile_analysis():
     # CSS for blue background and yellow text
@@ -748,7 +747,6 @@ def batsman_profile_analysis():
 
 
 
-
 def bowler_profile_analysis():
     # CSS for blue background and yellow text
     st.markdown(
@@ -823,8 +821,8 @@ def bowler_profile_analysis():
             if player_df.empty:
                 st.write(f"No data available for {bowler_name.title()} or the player has not bowled 300 balls.")
                 return
-            
-            # Calculate metrics and round to two decimal places
+
+            # Calculate metrics
             economy_phase_wise = player_df.groupby('Phase').apply(lambda x: round(x['bowlruns'].sum() / (x['ball'].count() / 6), 2)).reset_index()
             economy_phase_wise.columns = ['Phase', 'Economy Rate']
             
@@ -841,29 +839,47 @@ def bowler_profile_analysis():
             dot_ball_percentage_phase_wise = player_df.groupby('Phase').apply(lambda x: round((x['isDot'].sum() / x['ball'].count()) * 100, 2)).reset_index()
             dot_ball_percentage_phase_wise.columns = ['Phase', 'Dot Ball %']
 
-            # Display the analysis side by side
             st.write(f"Bowler Profile: {bowler_name.title()}")
 
-            col1, col2 = st.columns(2)
+            # Display the metrics as graphs with large size and numbers on the bars
+            fig, axes = plt.subplots(3, 2, figsize=(12, 15))  # Adjust the size of the figure for larger graphs
+            
+            # Economy Rate
+            axes[0, 0].bar(economy_phase_wise['Phase'], economy_phase_wise['Economy Rate'], color='skyblue')
+            axes[0, 0].set_title('Economy Rate by Phase')
+            for i, val in enumerate(economy_phase_wise['Economy Rate']):
+                axes[0, 0].text(i, val, f'{val}', ha='center', va='bottom')
 
-            with col1:
-                st.write("### Economy Rate:")
-                st.table(economy_phase_wise.sort_values('Phase'))
+            # Bowling Average
+            axes[0, 1].bar(bowling_avg_phase_wise['Phase'], bowling_avg_phase_wise['Bowling Avg'], color='green')
+            axes[0, 1].set_title('Bowling Average by Phase')
+            for i, val in enumerate(bowling_avg_phase_wise['Bowling Avg']):
+                axes[0, 1].text(i, val, f'{val}', ha='center', va='bottom')
 
-                st.write("### Wickets per Ball:")
-                st.table(wickets_per_ball_phase_wise.sort_values('Phase'))
+            # Wickets per Ball
+            axes[1, 0].bar(wickets_per_ball_phase_wise['Phase'], wickets_per_ball_phase_wise['Wickets per Ball'], color='purple')
+            axes[1, 0].set_title('Wickets per Ball by Phase')
+            for i, val in enumerate(wickets_per_ball_phase_wise['Wickets per Ball']):
+                axes[1, 0].text(i, val, f'{val}', ha='center', va='bottom')
 
-                st.write("### Dot Ball Percentage:")
-                st.table(dot_ball_percentage_phase_wise.sort_values('Phase'))
+            # Non-Control Percentage
+            axes[1, 1].bar(non_control_percentage_phase_wise['Phase'], non_control_percentage_phase_wise['Non-Control %'], color='red')
+            axes[1, 1].set_title('Non-Control Percentage by Phase')
+            for i, val in enumerate(non_control_percentage_phase_wise['Non-Control %']):
+                axes[1, 1].text(i, val, f'{val}', ha='center', va='bottom')
 
-            with col2:
-                st.write("### Bowling Average:")
-                st.table(bowling_avg_phase_wise.sort_values('Phase'))
+            # Dot Ball Percentage
+            axes[2, 0].bar(dot_ball_percentage_phase_wise['Phase'], dot_ball_percentage_phase_wise['Dot Ball %'], color='orange')
+            axes[2, 0].set_title('Dot Ball Percentage by Phase')
+            for i, val in enumerate(dot_ball_percentage_phase_wise['Dot Ball %']):
+                axes[2, 0].text(i, val, f'{val}', ha='center', va='bottom')
 
-                st.write("### Non-Control Percentage:")
-                st.table(non_control_percentage_phase_wise.sort_values('Phase'))
+            plt.tight_layout()  # Adjust layout to prevent overlap
+            st.pyplot(fig)
 
         bowler_profile()
+
+
 
 
 
